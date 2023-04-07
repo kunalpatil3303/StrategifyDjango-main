@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {% load static %}
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static './././node_modules/bootstrap/dist/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static './././node_modules/font-awesome/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static '././node_modules/bootstrap-social/bootstrap-social.css' %}">
+    <link rel="stylesheet" href="{% static './CSS/styles.css' %}">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <title>Registration</title>
+</head>
+<body>
+	<header>
+        <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-dark">
+            <a href="{% url 'home' %}" class="navbar-brand brand">Strategify</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a href="{% url 'home' %}" class="nav-link">Home <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">About Us</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'contactus' %}" class="nav-link">Contact Us</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <div class="modal fade" id="LoginModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-color" id="exampleModalLongTitle">Login</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form class="p-2" id="loginForm" method="POST">
+                        {% csrf_token %}
+                        <div class="form-group row p-1">
+                            <div class="col-12">
+                                <input type="text" name="email" id="loginUsername" placeholder="Username" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group row p-1">
+                            <div class="col-12">
+                                <input type="password" name="password" id="loginPassword" placeholder="Password" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group row p-1">
+                            <div class="col-12">
+                                <h6><strong id="loginMssg"></strong></h6>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="ghost btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" onclick="login()" class="ghost">Login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+
+    <div class="container signup-form" id="signup-form">
+        <div class="row mt-5 ">
+            <div class="col-md-6 col-xl-6 p-2 col-sm-12 col-xs-12 form-signup-container">
+                <form id="registerForm" method="POST">
+                    {% csrf_token %}
+                    <h1>Create Account</h1>
+                    <span>Use your email for registration</span>
+                    <input type="text" name="username" id="username" placeholder="Username" onKeyUp="checkUsername()" required>
+                    <span><strong id="usernameMssg"></strong></span>
+                    <input type="text" name="name" id="name" placeholder="Name">
+                    <input type="tel" name="phone" id="phone" placeholder="Phone No" pattern="[0-9]{3} [0-9]{3} [0-9]{4}" maxlength="12">
+                    <span><strong id="phoneMssg"></strong></span>
+                    <input type="email" name="email" id="email" placeholder="Email Id">
+                    <span><strong id="emailMssg"></strong></span>
+                    <input type="password" name="password" id="password" placeholder="Password">
+                    <span><strong id="passwordMssg"></strong></span>
+                    <input type="password" name="cpassword" id="cpassword" placeholder="Confirm Password" onKeyUp="checkPassword()">
+                    <span><strong id="cpasswordMssg"></strong></span>
+                    <button type="button" id="nextBtn" onclick="next()">Next   </button>
+                </form>
+            </div>
+            <div class="col-6 d-sm-none d-md-block d-none d-sm-block align-content-center form-overlay">
+                <div class="overlay-panel">
+                    <h1 class="brand">Strategify</h1>
+                    <h5>Just 10 seconds away to earn!</h5>
+                    <button data-toggle="modal" data-target="#LoginModal"  class="ghost">Login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container otp-form" id="otpFormContainer">
+        <div class="row mt-5 ">
+            <div class="col-md-6 col-xl-6 p-2 col-sm-12 col-xs-12 otp-form-signup-container">
+                <form id="otpForm" method="POST">
+                    {% csrf_token %}
+                    <span id="otpmsgg">OTP is send on</span>
+                    <input type="text" name="username" id="otpsignup" placeholder="OTP">
+                    <span><strong id="message"></strong></span>
+                    <button type="button" onclick="signup()">Validate OTP</button>
+                    <a  id="resendotp"  class="ghost">Resend OTP</a>
+                </form>
+            </div>
+            <div class="col-6 d-sm-none d-md-block d-none d-sm-block align-content-center form-overlay">
+                <div class="overlay-panel">
+                    <h1 class="brand">Strategify</h1>
+                    <h5>Just 10 seconds away to earn!</h5>
+                    <button data-toggle="modal" data-target="#LoginModal" id="signInBtn"  class="ghost">Login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- End Main Content -->
+
+    <footer class="sticky-footer fixed-bottom">
+        <div class="container">
+            <div class="text-center">
+                <small>Copyright © Strategify 2022</small>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- jQuery first, then Popper.js, then Bootstrap JS. -->
+    <script src="{% static 'node_modules/jquery/dist/jquery.slim.min.js' %}"></script>
+    <script src="{% static 'node_modules/popper.js/dist/umd/popper.min.js' %}"></script>
+    <script src="{% static 'node_modules/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="{% static '././JS/script.js' %}"></script>
+    <script>
+        var usernameStatus = 0;
+        var passwordStatus = 0;
+        var username,name,email,phone,password1 = "";
+
+        function validateEmail(arg) {
+            var validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+            if (arg.toLowerCase().match(validRegex)) {
+                return true;
+            } else{
+                return false;
+            }
+        }
+
+        function validatePhone(arg){
+            var validRegex = /^(1\s|1|)?((\(\d{3}\))|\d{3})(\-|\s)?(\d{3})(\-|\s)?(\d{4})$/
+            if (validRegex.test(arg)) {
+                return true;
+            }else{
+                return false;
+            }
+        }
+
+        function next(){
+            username = document.getElementById("username").value;
+            name = document.getElementById("name").value;
+            email = document.getElementById("email").value;
+            phone = document.getElementById("phone").value;
+            password1 = document.getElementById("password").value;
+            password2 = document.getElementById("cpassword").value;
+            csrfmiddlewaretoken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+            if(username == ""){
+                document.getElementById("username").focus();
+                return false;
+            }else if(name == ""){
+                document.getElementById("name").focus();
+            }else if(email == ""){
+                document.getElementById("email").focus();
+            }else if(phone == ""){
+                document.getElementById("phone").focus();
+            }else if(password1 == ""){
+                document.getElementById("password").focus();
+            }else if(password2 == ""){
+                document.getElementById("cpassword").focus();
+            }else if(password1 != password2){
+                message.innerHTML = "Both Password should be same";
+                message.style.color = 'red';
+                 setTimeout(function(){
+                    message.innerHTML = "";
+                }, 3000);
+            }
+            else{
+                if(passwordStatus == 0 || usernameStatus == 0){
+                return false;
+                }
+
+                if(!validateEmail(email)){
+                    document.getElementById("email").focus();
+                    document.getElementById("emailMssg").innerHTML = "Not Valid Email";
+                    setTimeout(function(){
+                        document.getElementById("emailMssg").innerHTML = "";
+                    }, 3000);
+                    return false;
+                }
+
+                if(!validatePhone(phone)){
+                    document.getElementById("phone").focus();
+                    document.getElementById("phoneMssg").innerHTML = "Not Valid Phone No";
+                    setTimeout(function(){
+                        document.getElementById("phoneMssg").innerHTML = "";
+                    }, 3000);
+                    return false;
+                }
+                nextBtn = document.getElementById("nextBtn");
+                nextBtn.innerHTML = "Loading    ";
+                var tag = document.createElement("i");
+                tag.className += 'fa fa-spinner fa-spin';
+                nextBtn.appendChild(tag);
+
+                $.ajax({
+                    type:"POST",
+                    url:'{% url 'generateotp' %}',
+                    data:{
+                      'csrfmiddlewaretoken': csrfmiddlewaretoken,
+                      'email':email,
+                    },
+                    success :function(data){
+                        if(data.success){
+                            document.getElementById("signup-form").style.display = "none";
+                            document.getElementById("otpFormContainer").style.display = "block";
+                            document.getElementById("otpmsgg").innerHTML = "OTP is sent on  "+email;
+                        }
+                    },
+                    error: function(data){
+                    console.log(data);
+                        document.getElementById("emailMssg").innerHTML = data;
+                    }
+                })
+            }
+        }
+
+        function signup(){
+            username = document.getElementById("username").value;
+            name = document.getElementById("name").value;
+            email = document.getElementById("email").value;
+            phone = document.getElementById("phone").value;
+            password1 = document.getElementById("password").value;
+            password2 = document.getElementById("cpassword").value;
+            otp = document.getElementById("otpsignup").value;
+            message = document.getElementById("message");
+            csrfmiddlewaretoken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+            if(username == ""){
+                document.getElementById("username").focus();
+                return false;
+            }else if(name == ""){
+                document.getElementById("name").focus();
+            }else if(email == ""){
+                document.getElementById("email").focus();
+            }else if(phone == ""){
+                document.getElementById("phone").focus();
+            }else if(password1 == ""){
+                document.getElementById("password").focus();
+            }else if(password2 == ""){
+                document.getElementById("cpassword").focus();
+            }else if(otp == ""){
+                document.getElementById("otpsignup").focus();
+                return false;
+            }else if(password1 != password2){
+                message.innerHTML = "Both Password should be same";
+                message.style.color = 'red';
+                 setTimeout(function(){
+                    message.innerHTML = "";
+                }, 3000);
+            }
+            else{
+            if(passwordStatus == 0 || usernameStatus == 0){
+            return false;
+            }
+            $.ajax({
+            type:"POST",
+            url:'{% url 'signup' %}',
+            data:{
+              'csrfmiddlewaretoken': csrfmiddlewaretoken,
+              'username':username,
+              'name':name,
+              'email':email,
+              'phone':phone,
+              'password':password1,
+              'otp': otp,
+            },
+            success :function(data){
+                console.log(data);
+                if(data.success){
+                message.innerHTML = data.success;
+                message.style.color = 'green';
+                setTimeout(function(){
+                    document.getElementById("signInBtn").classList.add("animate__animated");
+                    document.getElementById("signInBtn").classList.add("animate__bounceIn");
+                }, 1500);
+                }else{
+                message.innerHTML = data.error;
+                message.style.color = 'red';
+                setTimeout(function(){
+                    message.innerHTML = "";
+                }, 3000);
+                }
+            },
+            error: function(data){
+            console.log(data);
+            console.log(data["responseJSON"]);
+            }
+
+        })
+        }
+    }
+
+    function checkPassword(){
+        password1 = document.getElementById("password").value;
+        password2 = document.getElementById("cpassword").value;
+
+        if(password1 != password2){
+            document.getElementById("cpassword").style.border ="4px solid red";
+            setTimeout(function(){
+                    document.getElementById("cpassword").style.border = "";
+                }, 3000);
+            passwordStatus = 0
+        }else{
+            document.getElementById("cpassword").style.border ="4px solid green";
+            setTimeout(function(){
+                document.getElementById("cpassword").style.border = "none";
+            }, 3000);
+            passwordStatus = 1
+        }
+    }
+
+    function checkUsername(){
+        username = document.getElementById("username").value;
+        csrfmiddlewaretoken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+        if (username == "") {
+            document.getElementById("username").style.border = "none";
+            document.getElementById("usernameMssg").innerHTML = "";
+            return false;
+        }
+        $.ajax({
+            type:"POST",
+            url:'{% url 'checkUsername' %}',
+            data:{
+              'username':username,
+              'csrfmiddlewaretoken': csrfmiddlewaretoken,
+            },
+            success :function(data){
+                if(data.success){
+                    document.getElementById("username").style.border ="4px solid red";
+                    document.getElementById("usernameMssg").innerHTML = "Not Availiable";
+                    setTimeout(function(){
+                        document.getElementById("usernameMssg").innerHTML = ""
+                    }, 3000);
+                    usernameStatus = 0
+                }else{
+                    document.getElementById("username").style.border ="4px solid green";
+                    document.getElementById("usernameMssg").innerHTML = "Availiable"
+                    setTimeout(function(){
+                        document.getElementById("usernameMssg").innerHTML = ""
+                    }, 3000);
+                    usernameStatus = 1
+                }
+            }
+    })
+    }
+
+    function login(){
+        var loginPassword = document.getElementById("loginPassword").value;
+        var loginUsername = document.getElementById("loginUsername").value;
+        var message = document.getElementById("loginMssg");
+        csrfmiddlewaretoken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+        $.ajax({
+            type:"POST",
+            url:'{% url 'signIn' %}',
+            data:{
+              'csrfmiddlewaretoken': csrfmiddlewaretoken,
+              'password':loginPassword,
+              'username':loginUsername,
+            },
+            success :function(data){
+                if(data.success){
+                message.innerHTML = data.success;
+                message.style.color = 'green';
+                window.location = '{% url 'dashboard' %}';
+                }else{
+                message.innerHTML = data.error;
+                message.style.color = 'red';
+                }
+            }
+        })
+    }
+
+    </script>
+</body>
+</html>

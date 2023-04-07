@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {% load static %}
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static './././node_modules/bootstrap/dist/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static './././node_modules/font-awesome/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static '././node_modules/bootstrap-social/bootstrap-social.css' %}">
+    <link rel="stylesheet" href="{% static './CSS/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static './CSS/styles.css' %}">
+	<title>BackTestResult</title>
+</head>
+<body class="fixed-nav sticky-footer bg-dark" id="page-top">
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
+        <a class="navbar-brand brand" href="{% url 'home' %}">Strategify</a>
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
+                <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dashboard">
+                    <a class="nav-link" href="{% url 'dashboard' %}">
+                        <i class="fa fa-fw fa-dashboard"></i>
+                        <span class="nav-link-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+                    <a class="nav-link" href="{% url 'charts' %}">
+                        <i class="fa fa-fw fa-area-chart"></i>
+                        <span class="nav-link-text">Charts</span>
+                    </a>
+                </li>
+                <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Live Trades">
+                    <a class="nav-link" href="{% url 'deploypage' %}">
+                        <i class="fa fa-fw fa-table"></i>
+                        <span class="nav-link-text">Deployed Paper Trades</span>
+                    </a>
+                </li>
+                <li class="nav-item" data-toggle="tooltip" data-placement="right">
+                  <a class="nav-link" href="{% url 'configure' %}">
+                    <i class="fa fa-fw fa-link"></i>
+                    <span class="nav-link-text">Configure Bot</span>
+                  </a>
+                </li>
+                <li class="nav-item" data-toggle="tooltip" data-placement="right">
+                    <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseExamplePages" data-parent="#exampleAccordion">
+                        <i class="fa fa-fw fa-user"></i>
+                        <span class="nav-link-text">{{name}}</span>
+                    </a>
+                    <ul class="sidenav-second-level collapse" id="collapseExamplePages">
+                        <li>
+                        <a href="{% url 'profilepage' %}">Profile</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <ul class="navbar-nav sidenav-toggler">
+                <li class="nav-item">
+                    <a class="nav-link text-center" id="sidenavToggler">
+                        <i class="fa fa-fw fa-angle-left"></i>
+                    </a>
+                </li>
+            </ul>
+    </div>
+</nav>
+
+
+
+
+<div class="content-wrapper">
+    <div class="container-fluid">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active" id="strategyname">{{strategyName}}</li>
+        </ol>
+        <div class="container-fluid backtestHistory">
+            <div class="section-25 section-md-55 section-lg-75 section-xl-75 mt-5">
+                <div class="shell">
+                    <div class="range">
+                        <div class="row">
+                            <div class="col-6">
+                                {{response.POST.startDate}} to {{response.POST.stopDate}}
+                            </div>
+                            <div class="col-6 ml-auto align-content-end text-end">
+                                <button class="ghost" data-toggle="modal" data-target="#deploymodal">Deploy</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="range mt-5">
+                        <div class="row">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Instrument</th>
+                                            <th scope="col">LTP</th>
+                                            <th scope="col">Backtest P&L</th>
+                                            <th scope="col">Wins&Losses</th>
+                                            <th scope="col">Signals</th>
+                                            <th scope="col">Wins</th>
+                                            <th scope="col">Losses</th>
+                                            <th scope="col">WS</th>
+                                            <th scope="col">LS</th>
+                                            <!-- <th scope="col">Max DD</th> -->
+                                            <th scope="col"></th>
+                                            <th scope="col">CheckBox</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="MAonTCS">
+                                        {% if error %}
+                                            <tr>
+                                                <td colspan="12"><b>{{error.error}}</b></td>
+                                            </tr>
+                                        {% else %}
+                                            {% for e in data %}
+                                                <tr>
+                                                    <td data-label="Account" data-toggle="collapse" data-target="#{{e.ScripName}}" class="accordion-toggle">
+                                                        {{e.ScripName}}
+                                                    </td>
+                                                    <td data-label="Due Date" data-toggle="collapse" data-target="#{{e.ScripName}}" class="accordion-toggle">
+                                                        {{e.LTP}}
+                                                    </td>
+                                                    {% if e.Status == 0 %}
+                                                        <td data-label="Amount" data-toggle="collapse" data-target="#{{e.ScripName}}" class="accordion-toggle"><span class="text-danger">{{e.PL}}</span></td>
+                                                    {% else %}
+                                                        <td data-label="Amount" data-toggle="collapse" data-target="#{{e.ScripName}}" class="accordion-toggle"><span class="text-success">+{{e.PL}}</span></td>
+                                                    {% endif %}
+                                                    <td data-label="Period" data-toggle="collapse" data-target="#{{e.ScripName}}" class="accordion-toggle">
+                                                        <div class="progress bg-danger">
+                                                            <div class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 
+                                                            {{e.PercentBar}}%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td data-label="Account" data-toggle="collapse" data-target="#{{e.ScripName}}" class="accordion-toggle">
+                                                        {{e.Signal}}
+                                                    </td>
+                                                    <td data-label="Due Date" data-toggle="collapse" data-target="#{{e.ScripName}}" class="accordion-toggle">
+                                                        {{e.Wins}}
+                                                    </td>
+                                                    <td data-label="Amount" data-toggle="collapse" data-target="#{{e.ScripName}}" class="accordion-toggle">{{e.Loss}}</td>
+                                                    <td data-label="Period" data-toggle="collapse" data-target="#{{e.ScripName}}" class="accordion-toggle">{{e.WinStreak}}</td>
+                                                    <td data-label="Account" data-toggle="collapse" data-target="#{{e.ScripName}}" class="accordion-toggle">{{e.LossStreak}}</td>
+                                                    <!-- <td data-label="Due Date" data-toggle="collapse" data-target="#{{e.ScripName}}" class="accordion-toggle">--</td> -->
+                                                    <td data-label="Amount"><span><a href="static/GeneratedFile/{{e.username}}{{e.ScripName}}.csv"><i class="fa fa-download"></i></a></span></td>
+                                                    <td data-label="Period"><input type="checkbox" name="{{e.ScripName}}"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="12" class="hiddenRow">
+                                                        <div class="accordian-body collapse" id="{{e.ScripName}}">
+                                                            <div class="container-fluid">
+                                                                <div class="row">
+                                                                    <div class="col-6">
+                                                                        <div class="col-12 my-auto overflow-auto " id="graph-show">
+                                                                            <div id="{{e.ScripName}}graph"></div>
+                                                                          </div>
+                                                                    </div>
+                                                                    <div class="col-3 backtestHistorySecondC">
+                                                                        <div class="backtestHistorySecondCF">
+                                                                            <span class="backtestHistorySecondCF1">Total Quantites</span>
+                                                                            <span class="backtestHistorySecondCF2">{{e.Quantity}}</span>
+                                                                        </div>
+                                                                        <div class="backtestHistorySecondCF">
+                                                                            <span class="backtestHistorySecondCF1">Total no of Signal</span>
+                                                                            <span class="backtestHistorySecondCF2">{{e.Signal}}</span>
+                                                                        </div>
+                                                                        <div class="backtestHistorySecondCF">
+                                                                            <span class="backtestHistorySecondCF1">No of Wins</span>
+                                                                            <span class="backtestHistorySecondCF2">{{e.Wins}}</span>
+                                                                        </div>
+                                                                        <div class="backtestHistorySecondCF">
+                                                                            <span class="backtestHistorySecondCF1">No of Losses</span>
+                                                                            <span class="backtestHistorySecondCF2">{{e.Loss}}</span>
+                                                                        </div>
+                                                                        <div class="backtestHistorySecondCF">
+                                                                            <span class="backtestHistorySecondCF1">Winning Streak</span>
+                                                                            <span class="backtestHistorySecondCF2">{{e.WinStreak}}</span>
+                                                                        </div>
+                                                                        <div class="backtestHistorySecondCF">
+                                                                            <span class="backtestHistorySecondCF1">Lossing Streak</span>
+                                                                            <span class="backtestHistorySecondCF2">{{e.LossStreak}}</span>
+                                                                        </div>
+                                                                        <div class="backtestHistorySecondCF">
+                                                                            <span class="backtestHistorySecondCF1">Max Gain</span>
+                                                                            <span class="backtestHistorySecondCF2">{{e.MaxGain}}</span>
+                                                                        </div>
+                                                                        <div class="backtestHistorySecondCF">
+                                                                            <span class="backtestHistorySecondCF1">Max Loss</span>
+                                                                            <span class="backtestHistorySecondCF2">-{{e.MaxLoss}}</span>
+                                                                        </div>
+                                                                        <div class="backtestHistorySecondCF">
+                                                                            <span class="backtestHistorySecondCF1">Average gain</span>
+                                                                            <span class="backtestHistorySecondCF2">{{e.AvgGain}}</span>
+                                                                        </div>
+                                                                        <div class="backtestHistorySecondCF">
+                                                                            <span class="backtestHistorySecondCF1">Average Loss</span>
+                                                                            <span class="backtestHistorySecondCF2">-{{e.AvgLoss}}</span>
+                                                                        </div>
+                                                                        <!-- <div class="backtestHistorySecondCF">
+                                                                            <span class="backtestHistorySecondCF1">Max Drawdown</span>
+                                                                            <span class="backtestHistorySecondCF2">--</span>
+                                                                        </div> -->
+                                                                    </div>
+                                                                    <div class="col-3 backtestHistoryThirdC">
+                                                                        <div class="backtestHistoryThirdCF">
+                                                                            <span class="backtestHistoryThirdCF1">Period High</span>
+                                                                            <span class="backtestHistoryThirdCF2">{{e.PeriodHigh}}</span>
+                                                                        </div>
+                                                                        <div class="backtestHistoryThirdCF">
+                                                                            <span class="backtestHistoryThirdCF1">Period Low</span>
+                                                                            <span class="backtestHistoryThirdCF2">{{e.PeriodLow}}</span>
+                                                                        </div>
+                                                                        <!-- <div class="backtestHistoryThirdCF">
+                                                                            <span class="backtestHistoryThirdCF1">Period Return</span>
+                                                                            <span class="backtestHistoryThirdCF2">--%</span>
+                                                                        </div> -->
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade" id="deploymodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title text-color" id="indicator2headingModal">Deploy</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        
+                            <div class="form-group row p-1">
+                                <div class="col-6">
+                                    <label class="text-dark form-control">Algo Cycles</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="number" name="algocycles" id="algocycles" class="form-control">
+                                </div>
+                                <input type="hidden" name="allscriplist" id="allscriplist" class="form-control">
+                                <div class="col-12 align-self-center">
+                                    <label id="deploy"><i class="fa fa-check text-success deploy-status-icon" id="deploy-status-icon"></i></label>
+                                    <!--<input type="number" name="algocycles" id="algocycles" class="form-control">-->
+                                </div>
+                            </div>
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button class="btn btn-primary" name="deploy_submit" value="Done" onclick="return deploystrategy()">Done</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="sticky-footer">
+            <div class="container">
+                <div class="text-center">
+                  <small>Copyright © Strategify 2021</small>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+
+    
+    <!-- jQuery first, then Popper.js, then Bootstrap JS. -->
+    
+    <script src="{% static 'node_modules/jquery/dist/jquery.slim.min.js' %}"></script>
+    <script src="{% static 'node_modules/popper.js/dist/umd/popper.min.js' %}"></script>
+    <script src="{% static 'node_modules/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="{% static 'JS/script.js' %}"></script>
+    <script src="{% static 'JS/dailychart.js' %}"></script>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script>
+        csrfmiddlewaretoken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+        google.charts.load('current', {'packages':['line']});
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+
+            {% for e in data %}
+
+            var points = new google.visualization.DataTable();
+            points.addColumn('string', 'Day');
+            points.addColumn('number', 'Close');
+            var arr = []
+
+            var graphdata = {{e.graphdata|safe}}
+
+
+
+            for(let i =0;i<graphdata.length;i++){
+                var x = []
+                var removed = graphdata[i][0].toString().split(' ')[0]
+                x.push(removed.toString());
+                x.push(parseFloat(graphdata[i][1]));
+                arr.push(x);
+            }
+
+            points.addRows(arr);
+
+            var options = {
+              chart: {
+                title: "{{e.ScripName}}",
+              },
+              width: 720,
+              height: 500
+            };
+
+            var chart = new google.charts.Line(document.getElementById('{{e.ScripName}}graph'));
+
+            chart.draw(points, google.charts.Line.convertOptions(options));
+
+            {% endfor %}
+        }
+
+
+            
+
+        
+
+
+
+        function deploystrategy(){
+            var container = document.querySelector("#MAonTCS");
+            var checkboxesAll = container.querySelectorAll('input[type="checkbox"]');
+            var checkBoxesSelected = container.querySelectorAll('input[type="checkbox"]:checked');
+            var strategyname = document.getElementById('strategyname').innerHTML;
+            if(checkBoxesSelected.length > 0){
+                var allscrip = "";
+                allscrip += strategyname+"/";
+                
+                for(let i =0;i<checkBoxesSelected.length;i++){
+                    console.log(checkBoxesSelected[i].name);
+                    allscrip += checkBoxesSelected[i].name+"/";
+                }
+
+                let x = document.getElementById('allscriplist');
+                x.value = allscrip;
+                x.innerHTML = allscrip;
+                console.log(allscrip);
+                console.log(strategyname)
+
+                var allscriplist = document.getElementById("allscriplist").value;
+                var algocycles = document.getElementById("algocycles").value;
+
+                $.ajax({
+                    type:"POST",
+                    url:'{% url 'deploystrategy' %}',
+                    data:{
+                      'csrfmiddlewaretoken': csrfmiddlewaretoken,
+                      'allscriplist': allscriplist,
+                      'algocycles': algocycles,
+                    },
+                    success :function(data){
+                        if(data.success){
+                            document.getElementById('deploy').innerHTML = "Success Deployed";
+                            var element = document.createElement("i");
+                            element.classList.add("fa-check","fa","text-success");
+                            document.getElementById('deploy').appendChild(element);                               }
+                        else{
+                            document.getElementById('deploy').innerHTML = "Fail Deployed"
+                            var element = document.createElement("i");
+                            element.classList.add("fa-times","fa","text-danger");
+                            document.getElementById('deploy').appendChild(element);  
+                        }
+                    }
+                })
+
+                return false
+            }
+        }
+    </script>
+</body>
+</html>

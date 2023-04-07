@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  {% load static %}
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="{% static './././node_modules/bootstrap/dist/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static './././node_modules/font-awesome/css/font-awesome.min.css' %}">
+  <link rel="stylesheet" href="{% static '././node_modules/bootstrap-social/bootstrap-social.css' %}">
+  <link rel="stylesheet" href="{% static './CSS/dashboard.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <title>{{userdata.username}}</title>
+</head>
+<body class="fixed-nav sticky-footer bg-dark" id="page-top">
+  {% csrf_token %}
+  <nav class="navbar navbar-expand-xl navbar-dark bg-dark fixed-top" id="mainNav">
+    <a class="navbar-brand brand" href="{% url 'home' %}">Strategify</a>
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarResponsive">
+      <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dashboard">
+          <a class="nav-link" href="{% url 'dashboard' %}">
+            <i class="fa fa-fw fa-dashboard"></i>
+            <span class="nav-link-text">Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+          <a class="nav-link" href="{% url 'charts' %}">
+            <i class="fa fa-fw fa-area-chart"></i>
+            <span class="nav-link-text">Charts</span>
+          </a>
+        </li>
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Live Trades">
+            <a class="nav-link" href="#">
+                <i class="fa fa-fw fa-table"></i>
+                <span class="nav-link-text">Deployed Paper Trades</span>
+            </a>
+        </li>
+        <li class="nav-item" data-toggle="tooltip" data-placement="right">
+            <a class="nav-link" href="{% url 'configure' %}">
+                <i class="fa fa-fw fa-link"></i>
+                <span class="nav-link-text">Configure Bot</span>
+          </a>
+        </li>
+        <li class="nav-item" data-toggle="tooltip" data-placement="right">
+          <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseExamplePages" data-parent="#exampleAccordion">
+            <i class="fa fa-fw fa-user"></i>
+            <span class="nav-link-text">{{userdata.name}}</span>
+          </a>
+          <ul class="sidenav-second-level collapse" id="collapseExamplePages">
+            <li>
+              <a href="{% url 'profilepage' %}">Profile</a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <ul class="navbar-nav sidenav-toggler">
+        <li class="nav-item">
+          <a class="nav-link text-center" id="sidenavToggler">
+            <i class="fa fa-fw fa-angle-left"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <div class="content-wrapper">
+    <div class="container-fluid">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item active">Deploy Page</li>
+      </ol>
+      <!-- Area Chart Example-->
+        <div class="container">
+            <div id="deploy-status" class="row deploy-status">
+              <button class="tablinks active col-sm" onclick="opendeploytab(event, 'Waiting')">Waiting</button>
+              <button class="tablinks col-sm" onclick="opendeploytab(event, 'Entered')">Entered</button>
+              <button class="tablinks col-sm" onclick="opendeploytab(event, 'Stopped')">Stopped</button>
+            </div>
+        </div>
+        <div class="container-fluid mt-5">
+        <div class="active tabcontent table-responsive" id="Waiting">
+          <table class="table">
+            <thead class="table">
+              <tr>
+                <th scope="col">Strategy</th>
+                <th scope="col">Instrument</th>
+                <th scope="col">Date</th>
+                <th scope="col">LTP</th>
+                <th scope="col">P&L</th>
+                <th scope="col">Position</th>
+                <th scope="col">Target</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for e in deploydata %}
+                {% if e.waitenter == "WAIT" %}
+                <tr>
+                  <td data-toggle="collapse" data-target="#{{e.strategyname|cut:' '}}{{e.ScripName|cut:' '}}" class="accordion-toggle">{{e.strategyname}}</td>
+                  <td data-toggle="collapse" data-target="#{{e.strategyname|cut:' '}}{{e.ScripName|cut:' '}}" class="accordion-toggle">{{e.ScripName}}</td>
+                  <td data-toggle="collapse" data-target="#{{e.strategyname|cut:' '}}{{e.ScripName|cut:' '}}" class="accordion-toggle">{{e.deploydate}}</td>
+                  <td data-toggle="collapse" data-target="#{{e.strategyname|cut:' '}}{{e.ScripName|cut:' '}}" class="accordion-toggle">{{e.LTP}}</td>
+                  {% if e.Status == 1 %}
+                    <td data-toggle="collapse" data-target="#{{e.strategyname|cut:' '}}{{e.ScripName|cut:' '}}" class="accordion-toggle text-success">{{e.PL}}</td>
+                  {% elif e.Status == -1 %}
+                    <td data-toggle="collapse" data-target="#{{e.strategyname|cut:' '}}{{e.ScripName|cut:' '}}" class="accordion-toggle text-danger">{{e.PL}}</td>
+                  {% elif e.Status == 0 %}
+                    <td data-toggle="collapse" data-target="#{{e.strategyname|cut:' '}}{{e.ScripName|cut:' '}}" class="accordion-toggle">{{e.PL}}</td>
+                  {% endif %}
+                  <td data-toggle="collapse" data-target="#{{e.strategyname|cut:' '}}{{e.ScripName|cut:' '}}" class="accordion-toggle">{{e.waitenter}}</td>
+                  <td data-toggle="collapse" data-target="#{{e.strategyname|cut:' '}}{{e.ScripName|cut:' '}}" class="accordion-toggle">{{e.target}}%</td>
+                </tr>
+                {% if e.graphdata %}
+                  <tr>
+                    <td colspan="7" class="hiddenRow">
+                      <div class="accordian-body collapse" id="{{e.strategyname|cut:' '}}{{e.ScripName|cut:' '}}">
+                        <div class="container-fluid">
+                          <div class="row">
+                            <div class="col-8 bg-white">
+                               <div class="col-12 my-auto overflow-auto " id="graph-show">
+                                  <div id="{{e.ScripName}}graph"></div>
+                              </div>
+                            </div>
+                            <div class="col-4 d-flex flex-column p-5">
+                              <span class="font-700 font-size-22">Performance Report</span>
+                              <span class="font-700 font-size-14 mt-4"> {{e.algocycles}} AlgoCycles ({{e.deploydate}})</span>
+                              <div class="hr-div-report"></div>
+                                <div class="row">
+                                  <div class="col-6">
+                                    <span class="font-600 font-size-12">Total Quantites</span>
+                                  </div>
+                                  <div class="col-6">
+                                    <div class="float-right">
+                                      <span class="font-600 font-size-11">{{e.quantity}}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-6">
+                                    <span class="font-600 font-size-12">Cycles Completed</span>
+                                  </div>
+                                  <div class="col-6">
+                                    <div class="float-right">
+                                      <span class="font-600 font-size-11">{{e.cyclescount}}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-6">
+                                    <span class="font-600 font-size-12">P&L</span>
+                                  </div>
+                                  <div class="col-6">
+                                    <div class="float-right">
+                                      <span class="font-600 font-size-11">{{e.PL}}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-6">
+                                    <span class="font-600 font-size-12">LTP</span>
+                                  </div>
+                                  <div class="col-6">
+                                    <div class="float-right">
+                                      <span class="font-600 font-size-11">{{e.LTP}}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                {% endif %}
+                {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="tabcontent table-responsive" id="Entered">
+          <table class="table">
+            <thead class="table">
+              <tr>
+                <th scope="col">Strategy</th>
+                <th scope="col">Instrument</th>
+                <th scope="col">LTP</th>
+                <th scope="col">P&L</th>
+                <th scope="col">Position</th>
+                <th scope="col">Target</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for e in deploydata %}
+                {% if e.waitenter == "ENTER" %}
+                  <tr>
+                    <td data-toggle="collapse" data-target="#{{e.strategyname|cut:' '}}{{e.ScripName|cut:' '}}" class="accordion-toggle">
+                      {{e.strategyname}}
+                    </td>
+                    <td data-toggle="collapse" data-target="#{{e.strategyname|cut:' '}}{{e.ScripName|cut:' '}}" class="accordion-toggle">
+                      {{e.ScripName}}
+                    </td>
+                    <td data-toggle="collapse" data-target="#{{e.strategyname|cut:' '}}{{e.ScripName|cut:' '}}" class="accordion-toggle">
+                      {{e.LTP}}
+                    </td>
+                    {% if e.Status == 1 %}
+                      <td data-toggle="collapse" data-target="#{{e.strategyname|cut:' '}}{{e.ScripName|cut:' '}}" class="accordion-toggle text-success">
+                        {{e.PL}}
+                      </td>
+                    {% elif e.Status == -1 %}
+                      <td data-toggle="collapse" data-target="#{{e.strategyname|cut:' '}}{{e.ScripName|cut:' '}}" class="accordion-toggle text-danger">
+                        {{e.PL}}
+                      </td>
+                    {% elif e.Status == 0 %}
+                      <td data-toggle="collapse" data-target="#{{e.strategyname|cut:' '}}{{e.ScripName|cut:' '}}" class="accordion-toggle">
+                        {{e.PL}}
+                      </td>
+                    {% endif %}
+                    <td data-toggle="collapse" data-target="#{{e.strategyname|cut:' '}}{{e.ScripName|cut:' '}}" class="accordion-toggle">
+                      {{e.waitenter}}
+                    </td>
+                    <td data-toggle="collapse" data-target="#{{e.strategyname|cut:' '}}{{e.ScripName|cut:' '}}" class="accordion-toggle">
+                      {{e.target}}%
+                    </td>
+                  </tr>
+                  <tr>
+                  <td colspan="7" class="hiddenRow">
+                    <div class="accordian-body collapse" id="{{e.strategyname|cut:' '}}{{e.ScripName|cut:' '}}">
+                      <div class="container-fluid">
+                        <div class="row">
+                          <div class="col-6">
+                             <div class="col-12 my-auto overflow-auto " id="graph-show">
+                                <div id="{{e.ScripName}}graph"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="tabcontent table-responsive" id="Stopped">
+          <table class="table">
+            <thead class="table">
+              <tr>
+                <th scope="col">Strategy</th>
+                <th scope="col">Instrument</th>
+                <th scope="col">LTP</th>
+                <th scope="col">P&L</th>
+                <th scope="col">Position</th>
+                <th scope="col">Target</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for e in deploydata %}
+                {% if e.waitenter == "STOP" %}
+                  <tr>
+                    <td data-toggle="collapse" data-target="#{{e.strategyname|cut:' '}}{{e.ScripName|cut:' '}}" class="accordion-toggle">{{e.strategyname}}</td>
+                    <td data-toggle="collapse" data-target="#{{e.strategyname|cut:' '}}{{e.ScripName|cut:' '}}" class="accordion-toggle">{{e.ScripName}}</td>
+                    <td data-toggle="collapse" data-target="#{{e.strategyname|cut:' '}}{{e.ScripName|cut:' '}}" class="accordion-toggle">{{e.LTP}}</td>
+                    {% if e.Status == 1 %}
+                      <td data-toggle="collapse" data-target="#{{e.strategyname|cut:' '}}{{e.ScripName|cut:' '}}" class="accordion-toggle text-success">{{e.PL}}</td>
+                    {% elif e.Status == -1 %}
+                      <td data-toggle="collapse" data-target="#{{e.strategyname|cut:' '}}{{e.ScripName|cut:' '}}" class="accordion-toggle text-danger">{{e.PL}}</td>
+                    {% elif e.Status == 0 %}
+                      <td data-toggle="collapse" data-target="#{{e.strategyname|cut:' '}}{{e.ScripName|cut:' '}}" class="accordion-toggle">{{e.PL}}</td>
+                    {% endif %}
+                    <td data-toggle="collapse" data-target="#{{e.strategyname|cut:' '}}{{e.ScripName|cut:' '}}" class="accordion-toggle">{{e.waitenter}}</td>
+                    <td data-toggle="collapse" data-target="#{{e.strategyname|cut:' '}}{{e.ScripName|cut:' '}}" class="accordion-toggle">{{e.target}}%</td>
+                  </tr>
+                  <tr>
+                  <td colspan="7" class="hiddenRow">
+                    <div class="accordian-body collapse" id="{{e.strategyname|cut:' '}}{{e.ScripName|cut:' '}}">
+                      <label>{{e.strategyname}}</label>
+                      <div class="container-fluid">
+                        <div class="row">
+                          <div class="col-6">
+                             <div class="col-12 my-auto overflow-auto " id="graph-show">
+                                <div id="{{e.ScripName}}graph"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+    <!-- /.container-fluid-->
+    <!-- /.content-wrapper-->
+    <footer class="sticky-footer">
+      <div class="container">
+        <div class="text-center">
+          <small>Copyright © Strategify 2022</small>
+        </div>
+      </div>
+    </footer>
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+      <i class="fa fa-angle-up"></i>
+    </a>
+    <!-- Logout Modal-->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+            <a class="btn btn-primary" href="login.html">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS. -->
+    <script src="{% static 'node_modules/jquery/dist/jquery.slim.min.js' %}"></script>
+    <script src="{% static 'node_modules/popper.js/dist/umd/popper.min.js' %}"></script>
+    <script src="{% static 'node_modules/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+    <script src="{% static '././JS/deploy.js' %}"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script>
+      csrfmiddlewaretoken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+
+        google.charts.load('current', {'packages':['line']});
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+
+            {% for e in deploydata %}
+              {% if e.graphdata %}
+
+                var points = new google.visualization.DataTable();
+                points.addColumn('string', 'Day');
+                points.addColumn('number', 'Close');
+                points.addColumn('string', 'Signal');
+                var arr = []
+
+                var graphdata = {{e.graphdata|safe}}
+                console.log(graphdata)
+
+
+                for(let i =0;i<graphdata.length;i++){
+                    var x = []
+                    x.push(graphdata[i]['date'].toString());
+                    x.push(parseFloat(graphdata[i]['price']));
+                    x.push(graphdata[i]['buysell'].toString());
+                    arr.push(x);
+                }
+
+                points.addRows(arr);
+
+                var options = {
+                  chart: {
+                    title: "{{e.ScripName}}",
+                  },
+                  width: 950,
+                  height: 500
+                };
+
+                var chart = new google.charts.Line(document.getElementById('{{e.ScripName}}graph'));
+
+                chart.draw(points, google.charts.Line.convertOptions(options));
+              {% endif %}
+            {% endfor %}
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {% load static %}
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static './././node_modules/bootstrap/dist/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static './././node_modules/font-awesome/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static '././node_modules/bootstrap-social/bootstrap-social.css' %}">
+    <link rel="stylesheet" href="{% static './CSS/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static './CSS/styles.css' %}">
+    <title>Create Strategy</title>
+</head>
+<body class="fixed-nav sticky-footer bg-dark" id="page-top">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
+        <a class="navbar-brand brand" href="{% url 'home' %}">Strategify</a>
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
+                <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dashboard">
+                    <a class="nav-link" href="{% url 'dashboard' %}">
+                        <i class="fa fa-fw fa-dashboard"></i>
+                        <span class="nav-link-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+                    <a class="nav-link" href="{% url 'charts' %}">
+                        <i class="fa fa-fw fa-area-chart"></i>
+                        <span class="nav-link-text">Charts</span>
+                    </a>
+                </li>
+                <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Live Trades">
+                    <a class="nav-link" href="{% url 'deploypage' %}">
+                        <i class="fa fa-fw fa-table"></i>
+                        <span class="nav-link-text">Deployed Paper Trades</span>
+                    </a>
+                </li>
+                <li class="nav-item" data-toggle="tooltip" data-placement="right">
+                    <a class="nav-link" href="{% url 'configure' %}">
+                        <i class="fa fa-fw fa-link"></i>
+                        <span class="nav-link-text">Configure Bot</span>
+                  </a>
+                </li>
+                <li class="nav-item" data-toggle="tooltip" data-placement="right">
+                    <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseExamplePages" data-parent="#exampleAccordion">
+                        <i class="fa fa-fw fa-user"></i>
+                        <span class="nav-link-text">{{userdata.name}}</span>
+                    </a>
+                    <ul class="sidenav-second-level collapse" id="collapseExamplePages">
+                        <li>
+                            <a href="{% url 'profilepage' %}">Profile</a>
+                        </li>
+                    </ul>
+                </li>
+                {% if strategydata %}
+                <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Paper Trades">
+                    <a class="nav-link" href="#" onclick="return deletestrategy();">
+                        <i class="fa fa-fw fa-trash"></i>
+                        <span class="nav-link-text">Delete Strategy</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+            <ul class="navbar-nav sidenav-toggler">
+                <li class="nav-item">
+                    <a class="nav-link text-center" id="sidenavToggler">
+                        <i class="fa fa-fw fa-angle-left"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="content-wrapper">
+        <div class="container-fluid">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active">Create Strategy</li>
+            </ol>
+            {% if status %}
+            <div class="error-card">
+                <div class="card text-center w-50">
+                    <div class="card-header">
+                        Connection Error
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text text-danger error-box">{{status.error}}.</p>
+                        <a href="#" class="btn btn-primary">Need Help!</a>
+                    </div>
+                </div>
+            </div> 
+            {% else %}
+            
+            <div class="container createStrategy">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <form id="createStrategyform" action="{% url 'createsStrategyForm' %}" method="post">
+                            {% csrf_token %}
+                            <div class="card">
+                                <div class="card-body">
+                                    <div id="content">
+                                        <ul class="timeline">
+                                            <li class="event" value="Strategy Name">
+                                                <div class="row">
+                                                    <div class="col-8">
+                                                        <input type="text" name="strategyname" id="strategyname" placeholder="Strategy Name" class="form-control" onclick="checkStrategyName()" onKeyUp="checkStrategyName()">
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <h6><strong id="strategyNameMssg"></strong></h6>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="event" value="Position">
+                                                <div class="row mt-5">
+                                                    <div class="col-6">
+                                                        <input type="number" name="quantityLots" id="quantityLots" placeholder="Enter Quantity in lots" class="form-control" required>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <select class="form-select form-control" name="timeframe" id="timeframe" aria-label="Default select example">
+                                                            <option selected value="0">1 Day</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="event" value="Scrip">
+                                                <div class="row mt-5">
+                                                    <div class="col-lg-6 col-xl-6 col-md-12 col-sm-12 col-xs-12">
+                                                        <div class="wrapper">
+                                                            <div class="search-input">
+                                                                <input type="text" name="scrip" class="scrip form-control" placeholder="Add Scrip. E.g SBIN" autocomplete="off">
+                                                                <ul class="autocom-box" id="autocom-box">
+                                                                </ul>
+                                                            </div>
+                                                            <input type="hidden" name="allscriplist" id="allscriplist" class="form-control" >
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-xl-6 col-md-12 col-sm-12 col-xs-12">
+                                                        <div class="addedscripList" id="addedscripList">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="event" value="Entry Condition">
+                                                <div class="row mt-5">
+                                                    <div class="col-12 indicator-search indicator-search2">
+                                                        <div class="row">
+                                                            <div class="col-lg-4 col-xl-4 col-md-12 col-sm-12 col-xs-12">
+                                                                <div>
+                                                                    <input type="text" name="entryfirindicator1" id="entryfirindicator1" onkeyup="lookup(this)" placeholder="Indicator" class="form-control" autocomplete="off">
+                                                                    <ul class="indicatorsuggest-box" id="firindicatorBox1">
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-3 col-xl-3 col-md-12 col-sm-12 col-xs-12">
+                                                                <select class="form-select form-control" name="entrycomparator1" id="entrycomparator1" aria-label="Default select example">
+                                                                    <option value="0">Crosses Below</option>
+                                                                    <option value="1">Equal To</option>
+                                                                    <option selected value="2">Crosses Above</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-lg-4 col-xl-4 col-md-12 col-sm-12 col-xs-12">
+                                                                    <input type="text" name="entrysecindicator1" placeholder="Indicator" class="form-control indicator2" autocomplete="off" id="entrysecindicator1" onkeyup="lookup2(this)">
+                                                                    <ul class="indicatorsuggest-box2" id="secindicatorBox1">
+                                                                    </ul>
+                                                            </div>
+                                                        </div>
+                                                        <div class="entryConditionRow" id="entryConditionRow">
+
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span id="addEntryRow" onclick="addEntryRow()" class="addEntryRow">Add Another Field</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="event" value="Exit Condition">
+                                                <div class="row mt-4">
+                                                    <div class="col-12">
+                                                        <div class="row">
+                                                            <div class="col-lg-6 col-xl-6 col-sm-12 col-xs-12 col-md-12">
+                                                                <input type="text" name="stoploss" id="stoploss" placeholder="Stop loss %" class="form-control stoploss" required>
+                                                            </div>
+                                                            <div class="col-lg-6 col-xl-6 col-sm-12 col-xs-12 col-md-12">
+                                                                <input type="text" name="targetper" id="targetper" placeholder="Target %" class="form-control targetper" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="exitConditionRow mt-3 indicator-search3" id="exitConditionRow">
+
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <span onclick="addExitRow()" id="addExitRow" class="addExitRow">Add Exit Condition(Optional)</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row mt-5">
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                    <div class="row mt-4">
+                                                                        <div class="col-lg-6 col-xl-6 col-md-12 col-sm-12 col-xs-12">
+                                                                            <input onfocus="(this.type='date')" type="text" id="startDate"  name="startDate" placeholder="Start Date" class="form-control">
+                                                                            <span class="float-right"><small>Start date</small></span>
+                                                                        </div>
+                                                                        <div class="col-lg-6 col-xl-6 col-md-12 col-sm-12 col-xs-12">
+                                                                            <input onfocus="(this.type='date')" type="text" id="stopDate" name="stopDate" placeholder="Stop Date" class="form-control">
+                                                                            <span class="float-right"><small>End date</small></span>
+                                                                        </div>
+                                                                    </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="event" value="Finish">
+                                                <div class="row mt-5">
+                                                    <div class="col-12">
+                                                        <div class="row">
+                                                            <hr class="dashed">
+                                                            <div class="offset-lg-2 offset-xl-2">
+                                                            </div>
+                                                            <div class="col-12 text-center">
+                                                                <input type="submit" class="btn backTestBtn" name="backTestBtn" value="Backtest"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal fade" id="indicatorModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title text-color" id="indicatorheadingModal"></h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="form-group row p-1">
+                                                <div class="col-6">
+                                                    <label class="text-dark form-control">Period 1</label>
+                                                </div>
+                                                <div class="col-6">
+                                                    <input type="number" name="period1" class="form-control">
+                                                </div>
+                                                <div class="col-6">
+                                                    <label class="text-dark form-control">Period 2</label>
+                                                </div>
+                                                <div class="col-6">
+                                                    <input type="number" name="period2" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                            <button type="button" class="btn btn-primary"  id="modalIndicator">Done</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal fade" id="indicator2Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title text-color" id="indicator2headingModal"></h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="form-group row p-1">
+                                                <div class="col-6">
+                                                    <label class="text-dark form-control">Period 2</label>
+                                                </div>
+                                                <div class="col-6">
+                                                    <input type="number" name="indicatorperiod22" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                            <button type="button" class="btn btn-primary" id="modalIndicator2">Done</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal fade" id="indicatorCloseModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title text-color" id="indicator2headingModal"></h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="form-group row p-1">
+                                                <div class="col-6">
+                                                    <label class="text-dark form-control">Close</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                            <button type="button" class="btn btn-primary" id="closemodalIndicator">Done</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            <footer class="sticky-footer">
+                <div class="container">
+                    <div class="text-center">
+                        <small>Copyright © Strategify 2022</small>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS. -->
+    <script src="{% static 'node_modules/jquery/dist/jquery.min.js' %}"></script>
+    <script src="{% static 'node_modules/jquery/dist/jquery.slim.min.js' %}"></script>
+    <script src="{% static 'node_modules/popper.js/dist/umd/popper.min.js' %}"></script>
+    <script src="{% static 'node_modules/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+    <script src="{% static './JS/script.js' %}"></script>
+    <script src="{% static './JS/createStrategy.js' %}"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <script>
+
+        let suggestions = {{userdata.scripdata|safe}};
+        const searchWrapper = document.querySelector(".search-input");
+        const inputBox = searchWrapper.querySelector("input");
+        const suggBox = searchWrapper.querySelector(".autocom-box");
+        let scripList = [];
+        var scripAddedContainer = document.querySelector(".addedscripList");
+
+        if("{{strategydata}}" != "None"){
+            document.getElementById("strategyname").value = "{{strategydata.strategyname}}";
+            document.getElementById("quantityLots").value = "{{strategydata.quantity}}";
+            document.getElementById("stoploss").value = "{{strategydata.stoploss}}";
+            document.getElementById("targetper").value = "{{strategydata.target}}";
+            document.getElementById("startDate").value = "{{strategydata.startdate}}";
+            document.getElementById("stopDate").value = "{{strategydata.enddate}}";
+
+            var allscrip = "{{strategydata.scripname}}"
+            allscrip = allscrip.split(",");
+            for(let i = 0;i<allscrip.length-1;i++){
+                addScripName(allscrip[i])
+            }
+
+            var entrycondition = "{{strategydata.entrycondition}}"
+            var entryCounter = 2;
+            entrycondition = entrycondition.split("/");
+
+
+            for(let i = 0;i<entrycondition.length-1;i++){
+                var entry = entrycondition[i].split("-");
+                if(i==0){
+                    document.getElementById("entryfirindicator1").value = entry[0];
+                    document.getElementById("entrycomparator1").options.selectedIndex = entry[2];
+                    document.getElementById("entrysecindicator1").value = entry[1];
+                }else{
+                    var div = document.createElement('div');
+                    div.className = 'row fadeIn';
+                    div.id = 'inputEntryFormRow';
+                    div.innerHTML =  
+                                    `<div class="col-lg-4 col-xl-4 col-md-12 col-sm-12 col-xs-12">`+
+                                        `<div class="indicator-search">`+
+                                            `<input type="text" name="entryfirindicator`+entryCounter+`" placeholder="Indicator" class="form-control" autocomplete="off" id="entryfirindicator`+entryCounter+`" onkeyup="lookup(this);" required>`+
+                                            `<ul class="indicatorsuggest-box" id="firindicatorBox`+entryCounter+`"></ul>`+
+                                        `</div>`+
+                                    `</div>`+
+                                    `<div class="col-lg-3 col-xl-3 col-md-12 col-sm-12 col-xs-12">`+
+                                        `<select class="form-select form-control" id="entrycomparator`+entryCounter+`" name="entrycomparator`+entryCounter+`" aria-label="Default select example">`+
+                                            `<option value="0">Crosses Below</option><option value="1">Equal To</option><option selected value="2">Crosses Above</option>`+
+                                        `</select>`+
+                                    `</div>`+
+                                    `<div class="col-lg-4 col-xl-4 col-md-12 col-sm-12 col-xs-12">`+
+                                        `<input type="text" name="entrysecindicator`+entryCounter+`" id="entrysecindicator`+entryCounter+`" placeholder="Indicator" class="form-control" onkeyup="lookup2(this)" required >`+
+                                        `<ul class="indicatorsuggest-box2" id="secindicatorBox`+entryCounter+`"></ul></div><div class="col-1">`+
+                                        `<span class="w-50 h-50 deleteEntryRow" onclick="removeEntryRow(this)" style="font-size:3rem">&times;</span>`+
+                                    `</div>`
+
+                    document.getElementById('entryConditionRow').appendChild(div);
+                    document.getElementById("entryfirindicator"+entryCounter).value = entry[0];
+                    document.getElementById("entrycomparator"+entryCounter).options.selectedIndex = entry[2];
+                    document.getElementById("entrysecindicator"+entryCounter).value = entry[1];
+                    entryCounter += 1;
+                }
+            }
+
+
+            var exitcondition = "{{strategydata.exitcondition}}"
+            var exitCounter = 1;
+            exitcondition = exitcondition.split("/");
+
+            for(let i = 0;i<exitcondition.length-1;i++){
+                console.log('Exit Counter: '+exitCounter);
+                var exit = exitcondition[i].split("-");
+                var div = document.createElement('div');
+                div.className = 'row fadeIn';
+                div.id = 'inputExitFormRow';
+                div.innerHTML = 
+                                `<div class="col-lg-4 col-xl-4 col-md-12 col-sm-12 col-xs-12">`+
+                                        `<input type="text" name="exitfirindicator`+exitCounter+`" placeholder="Indicator" class="form-control" autocomplete="off" id="exitfirindicator`+exitCounter+`" onkeyup="lookup3(this);" required>`+
+                                        `<ul class="indicatorsuggest-box3" id="exitfirindicatorBox`+exitCounter+`"></ul>`+
+                                `</div>`+
+                                `<div class="col-lg-3 col-xl-3 col-md-12 col-sm-12 col-xs-12">`+
+                                    `<select class="form-select form-control" id="exitcomparator`+exitCounter+`" name="exitcomparator`+exitCounter+`" aria-label="Default select example">`+
+                                                            `<option selected value="0">Crosses Below</option><option value="1">Equal To</option><option selected value="2">Crosses Above</option></select>`+
+                                `</div>`+
+                                `<div class="col-lg-4 col-xl-4 col-md-12 col-sm-12 col-xs-12">`+
+                                    `<input type="text" name="exitsecindicator`+exitCounter+`" id="exitsecindicator`+exitCounter+`" placeholder="Indicator" class="form-control" onkeyup="lookup4(this)" required>`+
+                                    `<ul class="indicatorsuggest-box4" id="exitsecindicatorBox`+exitCounter+`"></ul></div><div class="col-1">`+
+                                    `<span class="w-50 h-50 deleteExitRow" onclick="removeExitRow(this)" style="font-size:3rem">&times;</span>`+
+                                `</div>`
+
+
+                document.getElementById('exitConditionRow').appendChild(div);
+                document.getElementById("exitfirindicator"+exitCounter).value = exit[0];
+                document.getElementById("exitcomparator"+exitCounter).options.selectedIndex = exit[2];
+                document.getElementById("exitsecindicator"+exitCounter).value = exit[1];
+                exitCounter += 1;       
+            }
+        }
+            
+
+        inputBox.onkeyup = (e)=>{
+        let userData = e.target.value;
+        let emptyArray = [];
+        if(userData){
+            emptyArray = suggestions.filter((data)=>{
+                return data.toLocaleLowerCase().startsWith(userData.toLocaleLowerCase());
+            });
+            emptyArray = emptyArray.map((data)=>{
+                return data = `<li>${data}</li>`;
+            });
+            searchWrapper.classList.add("active");
+
+            showSuggestions(emptyArray);
+            let allList = suggBox.querySelectorAll("li");
+            for (let i = 0; i < allList.length; i++) {
+                allList[i].setAttribute("name", "this.innerText");
+                allList[i].setAttribute("onclick", "addScripName(this.innerText)");
+            }
+        }else{
+            searchWrapper.classList.remove("active");
+        }
+    }
+
+    
+    function addScripName(element){
+
+        var scripAddedName = document.createElement("a");
+        scripAddedName.setAttribute("class","btn fadeIn");
+        scripAddedName.setAttribute("name",element);
+        scripAddedName.setAttribute("value",element);
+        scripAddedName.setAttribute("id",element);
+        scripAddedName.innerHTML = element;
+
+        inputBox.value ="";
+        var span = document.createElement('span');
+        span.setAttribute("class","removeAddedScripName");
+        span.setAttribute("onclick","cancel('" + element + "')");
+        span.innerHTML = '&times';
+        scripAddedName.append(span);
+        scripAddedContainer.append(scripAddedName);
+        searchWrapper.classList.remove("active");
+        scripList.push(element);
+
+        let v = ""
+
+        for(let i = 0;i<scripList.length;i++){
+            v += scripList[i]+",";
+        }
+
+        let x = document.getElementById('allscriplist');
+        x.value = v;
+        x.innerHTML = v;
+    }
+
+    function showSuggestions(list){
+        let listData;
+        if(!list.length){
+            userValue = inputBox.value;
+            listData = `<li>${userValue}</li>`;
+        }else{
+          listData = list.join('');
+        }
+        suggBox.innerHTML = listData;
+    }
+
+
+    function cancel(val){
+        var parent = document.getElementById('autocom-box');
+        var child = document.getElementById(val);
+        child.remove(parent);
+        var index = scripList.indexOf(val);
+        if (index !== -1) {
+          scripList.splice(index, 1);
+        }
+        let v = "";
+        for(let i = 0;i<scripList.length;i++){
+            v += scripList[i]+",";
+        }
+
+        let x = document.getElementById('allscriplist');
+        x.value = "";
+        x.innerHTML = "";
+        x.value = v;
+        x.innerHTML = v;
+
+    }
+
+    
+    csrfmiddlewaretoken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+
+    function checkStrategyName(){
+    
+        var url = '{% url 'checkstrategyname' %}';
+        let data = new FormData();
+        data.append("strategyname", document.getElementById('strategyname').value)  
+        data.append("csrfmiddlewaretoken", '{{csrf_token}}')
+
+        axios.post(url,data)
+          .then(function (response) {
+            console.log(response);
+            if(response.data.success){
+                document.getElementById("strategyname").style.border ="4px solid red";
+                document.getElementById("strategyNameMssg").innerHTML = "Not Availiable";
+            }else{
+                document.getElementById("strategyname").style.border ="4px solid green";
+                document.getElementById("strategyNameMssg").innerHTML = "Availiable";
+            }
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+
+    }
+
+    function deletestrategy(arg){
+            /*$.ajax({
+                type:"POST",
+                url:'{% url 'deletestrategy' %}',
+                data:{
+                  'strategyname':"{{strategydata.strategyname}}",
+                  'csrfmiddlewaretoken': csrfmiddlewaretoken,
+                },
+                success :function(data){
+                    console.log(data);
+                    if(data.success){
+                        console.log("Sucess");
+                        window.location = '{% url 'dashboard' %}';
+                    }else{
+                        console.log("Error Deleting");
+                    }
+                }
+            })*/
+
+            var url = '{% url 'deletestrategy' %}';
+            let data = new FormData();
+            data.append("strategyname", "{{strategydata.strategyname}}")  
+            data.append("csrfmiddlewaretoken", '{{csrf_token}}')
+
+            axios.post(url,data)
+              .then(function (response) {
+                console.log(response);
+                window.location = '{% url 'dashboard' %}';
+              })
+              .catch(function (error) {
+                console.log(error);
+              });
+            return false;
+        }
+
+
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    {% load static %}
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static './././node_modules/bootstrap/dist/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static './././node_modules/font-awesome/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static '././node_modules/bootstrap-social/bootstrap-social.css' %}">
+    <link rel="stylesheet" href="{% static './CSS/styles.css' %}">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <title>About Us</title>
+</head>
+
+<body>
+    <header class="page-head">
+        <nav class="navbar navbar-expand-md navbar-dark fixed-top aboutus-nav">
+            <a href="{% url 'home' %}" class="navbar-brand brand">Strategify</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">Home <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active">About Us</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'contactus' %}" class="nav-link">Contact Us</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <div class="dropdown-menu text-left" aria-labelledby="navbarDropdown">
+                            <a href="index.html" class="dropdown-item text-dark">Logout</a>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" data-toggle="modal" data-target="#LoginModal"  class="nav-link">Log In</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="modal fade" id="LoginModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-color" id="exampleModalLongTitle">Login</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="p-2" id="loginForm" method="POST">
+                            {% csrf_token %}
+                            <div class="form-group row p-1">
+                                <div class="col-12">
+                                    <input type="text" name="email" id="loginUsername" placeholder="Username" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row p-1">
+                                <div class="col-12">
+                                    <input type="password" name="password" id="loginPassword" placeholder="Password" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row p-1 loginMssg">
+                                <div class="col-12">
+                                    <h6><strong id="loginMssg"></strong></h6>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="ghost btn btn-secondary" data-dismiss="modal">Close</button>
+                        <a type="button" class="btn btn-primary primarybtn" href="{% url 'registrationpage' %}">Register</a>
+                        <button type="button" onclick="login()" class="ghost">Login</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container-fluid bg-light p-5 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <p class="aboutus-heading">Strategify</p>
+                </div>
+            </div>
+            <div class="row aboutus">
+                <div class="col-12 align-self-center">
+                    <p>Strategify is a web platform working towards providing it's users tools to test their trading strategies to get a better understanding of how well their plans may work in the future based on analysis of historical data. Our easy-to-use website makes it easy for even the laymen to test their plans and make improvisations to them as and when needed.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="container-fluid p-5 aboutus-vision">
+        <div class="row">
+            <div class="col-12 col-md-4 col-lg-4 col-xl-4 d-flex flex-column align-items-center p-5 align-self-center">
+                <h2 class="vision-aboutus text-center">Our Vision</h2>
+            </div>
+            <div class="col-12 col-md-6 col-lg-6 col-xl-6 d-flex align-self-center aboutus-vision-content">
+                <p class="font-family-none font-size-14">At Strategify, we understand the importance of our client's money. A well tested trading plan is the foundation for survival and profits in the Markets. If you are thinking of trading in the Stock Market, a well tested trading strategy can make all the difference. We wish to encourage the people's participation in the Stock Markets by providing a platform for testing their strategies risk free.</p>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="container-fluid bg-light aboutus p-5">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="font-family-none">Our Features</h1><br>
+            </div>
+        </div>
+        <div class="row">
+          <div class="column col-12 col-md-3  col-xl-3">
+            <div class="card">
+              <h3></h3>
+              <p>You can create and test your strategies using
+                 Every stock listed on the National Stock Exchange.</p>
+            </div>
+          </div>
+          <div class="column col-12 col-md-3  col-xl-3">
+            <div class="card">
+              <p>You can create and test your strategies using
+                on any number of years.</p>
+            </div>
+          </div>
+          <div class="column col-12 col-md-3  col-xl-3">
+            <div class="card">
+              <p>You can create and test your strategies and  
+              Deploy your strategies live, virtually as paper trades.</p>
+            </div>
+          </div>
+          <div class="column col-12 col-md-3  col-xl-3">
+            <div class="card">
+              <p>You can create and test your strategies using
+                Wide variety of technical indicators</p>
+            </div>
+          </div>
+        </div>
+    </div>
+    
+
+
+    <footer class="sticky-footer">
+      <div class="container">
+        <div class="text-center">
+          <small>Copyright © Strategify 2022</small>
+        </div>
+      </div>
+    </footer>
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS. -->
+    <script src="{% static 'node_modules/jquery/dist/jquery.slim.min.js' %}"></script>
+    <script src="{% static 'node_modules/popper.js/dist/umd/popper.min.js' %}"></script>
+    <script src="{% static 'node_modules/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="{% static './././node_modules/jquery/dist/jquery.min.js' %}"></script>
+    <script src="{% static '././JS/script.js' %}"></script>
+    <script type="text/javascript">
+        AOS.init();
+        function login(){
+        var loginPassword = document.getElementById("loginPassword").value;
+        var loginUsername = document.getElementById("loginUsername").value;
+        var message = document.getElementById("loginMssg");
+        csrfmiddlewaretoken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+        $.ajax({
+            type:"POST",
+            url:'{% url 'signIn' %}',
+            data:{
+              'csrfmiddlewaretoken': csrfmiddlewaretoken,
+              'password':loginPassword,
+              'username':loginUsername,
+            },
+            success :function(data){
+                console.log(data);
+                if(data.success){
+                message.innerHTML = data.success;
+                message.style.color = 'green';
+                message.classList.add("fadeIn");
+                window.location = '{% url 'dashboard' %}';
+                }else{
+                message.innerHTML = data.error;
+                message.style.color = 'red';
+                message.classList("fadeIn");
+                }
+            }
+        })
+    }
+    </script>
+</body>
+</html>

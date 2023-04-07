@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {% load static %}
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static './././node_modules/bootstrap/dist/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static './././node_modules/font-awesome/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static '././node_modules/bootstrap-social/bootstrap-social.css' %}">
+    <link rel="stylesheet" href="{% static './CSS/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static './CSS/styles.css' %}">
+    <title>Error</title>
+</head>
+<body>
+    
+<div class="error-card">
+    <div class="card text-center w-50">
+        <div class="card-header">
+            Connection Error
+        </div>
+        <div class="card-body">
+            <p class="card-text text-danger error-box">{{error}}.</p>
+            <a href="#" class="btn btn-primary">Need Help!</a>
+        </div>
+    </div>
+</div> 
+</body>
+</html>
+

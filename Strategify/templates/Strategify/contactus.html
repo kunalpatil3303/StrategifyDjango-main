@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    {% load static %}
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static './././node_modules/bootstrap/dist/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static './././node_modules/font-awesome/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static '././node_modules/bootstrap-social/bootstrap-social.css' %}">
+    <link rel="stylesheet" href="{% static './CSS/styles.css' %}">
+	<title>Contact US</title>
+</head>
+<body>
+	<header>
+        <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-dark">
+            <a href="{% url 'home' %}" class="navbar-brand brand">Strategify</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a href="{% url 'home' %}" class="nav-link">Home <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'aboutus' %}" class="nav-link">About Us</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active">Contact Us</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" data-toggle="modal" data-target="#LoginModal"  class="nav-link">Log In</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <div class="modal fade" id="LoginModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-color" id="exampleModalLongTitle">Login</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form class="p-2" id="loginForm" method="POST">
+                        {% csrf_token %}
+                        <div class="form-group row p-1">
+                            <div class="col-12">
+                                <input type="text" name="email" id="loginUsername" placeholder="Username" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group row p-1">
+                            <div class="col-12">
+                                <input type="password" name="password" id="loginPassword" placeholder="Password" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group row p-1 loginMssg">
+                            <div class="col-12">
+                                <h6><strong id="loginMssg"></strong></h6>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="ghost btn btn-secondary" data-dismiss="modal">Close</button>
+                    <a type="button" class="btn btn-primary primarybtn" href="{% url 'registrationpage' %}">Register</a>
+                    <button type="button" onclick="login()" class="ghost">Login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+        <section id="contact" class="hvh-95">
+            <div class="contact-box">
+                <div class="contact-links">
+                    <h2>CONTACT</h2>
+                    <div class="links">
+                        <div class="link">
+                            <a><i class="fa fa-2x fa-phone"></i></a>
+                        </div>
+                        <div class="link">
+                            <a><i class="fa fa-2x fa-envelope"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-form-wrapper">
+                    <form>
+                        <div class="form-item">
+                            <input type="text" name="sender" required>
+                            <label>Name:</label>
+                        </div>
+                        <div class="form-item">
+                            <input type="text" name="email" required>
+                            <label>Email:</label>
+                        </div>
+                        <div class="form-item">
+                            <textarea class="" name="message" required></textarea>
+                            <label>Message:</label>
+                        </div>
+                        <button class="submit-btn">Send</button>  
+                    </form>
+                </div>
+            </div>
+        </section>
+
+
+	<footer class="sticky-footer">
+      <div class="container">
+        <div class="text-center">
+          <small>Copyright © Strategify 2022</small>
+        </div>
+      </div>
+    </footer>
+
+	<!-- jQuery first, then Popper.js, then Bootstrap JS. -->
+    <script src="{% static 'node_modules/jquery/dist/jquery.slim.min.js' %}"></script>
+    <script src="{% static 'node_modules/popper.js/dist/umd/popper.min.js' %}"></script>
+    <script src="{% static 'node_modules/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="{% static '././JS/script.js' %}"></script>
+    <script type="text/javascript">
+        function login(){
+        var loginPassword = document.getElementById("loginPassword").value;
+        var loginUsername = document.getElementById("loginUsername").value;
+        var message = document.getElementById("loginMssg");
+        csrfmiddlewaretoken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+        $.ajax({
+            type:"POST",
+            url:'{% url 'signIn' %}',
+            data:{
+              'csrfmiddlewaretoken': csrfmiddlewaretoken,
+              'password':loginPassword,
+              'username':loginUsername,
+            },
+            success :function(data){
+                console.log(data);
+                if(data.success){
+                message.innerHTML = data.success;
+                message.style.color = 'green';
+                message.classList.add("fadeIn");
+                window.location = '{% url 'dashboard' %}';
+                }else{
+                message.innerHTML = data.error;
+                message.style.color = 'red';
+                message.classList("fadeIn");
+                }
+            }
+        })
+    }
+    </script>
+</body>
+</html>

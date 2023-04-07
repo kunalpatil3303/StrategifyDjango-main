@@ -1,0 +1,322 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  {% load static %}
+  <link rel="stylesheet" href="{% static './././node_modules/bootstrap/dist/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static './././node_modules/font-awesome/css/font-awesome.min.css' %}">
+  <link rel="stylesheet" href="{% static '././node_modules/bootstrap-social/bootstrap-social.css' %}">
+  <link rel="stylesheet" href="{% static './CSS/dashboard.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <title>{{userdata.username}}</title>
+</head>
+<body class="fixed-nav sticky-footer bg-dark" id="page-top">
+  {% csrf_token %}
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
+    <a class="navbar-brand brand" href="{% url 'home' %}">Strategify</a>
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarResponsive">
+      <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dashboard">
+          <a class="nav-link" href="#">
+            <i class="fa fa-fw fa-dashboard"></i>
+            <span class="nav-link-text">Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+          <a class="nav-link" href="{% url 'charts' %}">
+            <i class="fa fa-fw fa-area-chart"></i>
+            <span class="nav-link-text">Charts</span>
+          </a>
+        </li>
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Live Trades">
+          <a class="nav-link" href="{% url 'deploypage' %}">
+            <i class="fa fa-fw fa-table"></i>
+            <span class="nav-link-text">Deployed Paper Trades</span>
+          </a>
+        </li>
+        <li class="nav-item" data-toggle="tooltip" data-placement="right">
+          <a class="nav-link" href="{% url 'configure' %}">
+            <i class="fa fa-fw fa-link"></i>
+            <span class="nav-link-text">Configure Bot</span>
+          </a>
+        </li>
+        <li class="nav-item" data-toggle="tooltip" data-placement="right">
+          <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseExamplePages" data-parent="#exampleAccordion">
+            <i class="fa fa-fw fa-user"></i>
+            <span class="nav-link-text">{{userdata.name}}</span>
+          </a>
+          <ul class="sidenav-second-level collapse" id="collapseExamplePages">
+            <li>
+              <a href="{% url 'profilepage' %}">Profile</a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <ul class="navbar-nav sidenav-toggler">
+        <li class="nav-item">
+          <a class="nav-link text-center" id="sidenavToggler">
+            <i class="fa fa-fw fa-angle-left"></i>
+          </a>
+        </li>
+      </ul>
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <form class="form-inline my-2 my-lg-0 mr-lg-2">
+            {% csrf_token %}
+            <div class="input-group">
+              <input class="form-control" type="text" placeholder="Search Strategy..." id="searchStrategy" onkeyup="searchStrategyByName()">
+              <span class="input-group-append">
+                <button class="btn btn-primary" type="button">
+                  <i class="fa fa-search"></i>
+                </button>
+              </span>
+            </div>
+          </form>
+          <ul class="autocom-box" id="autocom-box">
+            
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <div class="content-wrapper">
+    <div class="container-fluid">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item active">Dashboard</li>
+      </ol>
+      <div class="row" id="indexData">
+       
+      </div>
+      <div class="row">
+        <div class="col-12 p-3">
+          <a href="{% url 'allindices' %}" class="float-right allindices-btn">View All</a>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <div class="mb-0 mt-4 font-size-12 font-600">My Strtategies </div>
+          <hr class="mt-2">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-1 mb-3 previous-pointer">
+          <span><i class="btn previous fa fa-fw fa-arrow-left" id="slideLeft"></i></span>
+        </div>
+        <div class="col-xl-10 mb-3 col-sm-12 col-xs-12 ">
+          <div class="mystrategy" id="mystrategy">
+            <div class="col-xl-3 col-sm-8 mb-3 animate__animated animate__zoomIn strategyCard">
+              <div class="card o-hidden h-100">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between">
+                    <div class="d-flex flex-row align-items-center">
+                      <div class="ms-2 c-details">
+                        <h5><b>Create New Strategy</b></h5>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mt-2">
+                    <h6 class="heading">Create and backtest.</h6>
+                  </div>
+                  <div class="mt-5">
+                  </div>
+                </div>
+                <a href="{% url 'createstrategy' %}" class="card-footer clearfix small z-1" href="#">
+                  <span class="float-left font-12">Create Here</span>
+                  <span class="float-right">
+                    <i class="fa fa-plus"></i>
+                  </span>
+                </a>
+              </div>
+            </div>
+            {% for e in strategydata %}
+              <div class="col-xl-3 col-sm-8 mb-3 animate__animated animate__zoomIn strategyCard">
+                <div class="card o-hidden h-100" onclick="return openStrategy('{{e.strategyname}}')">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                      <div class="d-flex flex-row align-items-center delete-strategy-row">
+                        <div class="ms-2 c-details">
+                          <h5 class="heading" id="strategy-heading">{{e.strategyname}}</h5>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="mt-2 d-flex justify-content-between">
+                      <div class="d-flex flex-row align-items-center">
+                        <h6 class="heading ms-2">{{e.scripname}}</h6>
+                      </div>
+                    </div>
+                    <div class="mt-5">
+                      <div class="mt-2"> <span class="text1">Last Modified: {{e.createDate}}</span> </div>
+                    </div>
+                  </div>
+                  <a class="card-footer clearfix small z-1" href="#">
+                    <span class="float-left">View Details</span>
+                    <span class="float-right">
+                      <i class="fa fa-angle-right"></i>
+                    </span>
+                  </a>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="col-1 mb-3 next-pointer">
+          <span><i class="btn next fa fa-fw fa-arrow-right" id="slideRight"></i></span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-8">
+          <div class="mb-0 mt-4 font-size-12 font-600">Sample Strategies </div>
+          <hr class="mt-2">
+          <div class="row">
+                <div class="col-12 my-auto">
+                  <div class="row">
+                    <div class="col-1 mb-3 previous-pointer">
+                      <a href="#" class="btn previous fa fa-fw fa-arrow-left" id="slideLeft"></a>
+                    </div>
+                    <div class="col-xl-10 mb-3 col-sm-12 col-xs-12 ">
+                      <div class="mystrategy" id="mystrategy">
+                        {% if sampleStrategy %}
+                          {% for e in sampleStrategy %}
+                            <div class="col-xl-3 col-sm-8 mb-3 animate__animated animate__zoomIn strategyCard">
+                              <div class="card o-hidden h-100" onclick="return opensampleStrategy('{{e.strategyname}}')">
+                                <div class="card-body">
+                                  <div class="d-flex justify-content-between">
+                                    <div class="d-flex flex-row align-items-center">
+                                      <div class="ms-2 c-details">
+                                        <h5 class="heading" id="strategy-heading">{{e.strategyname}}</h5>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="mt-2">
+                                    <h6 class="heading">{{e.scripname}}</h6>
+                                  </div>
+                                </div>
+                                <a class="card-footer clearfix small z-1" href="#">
+                                  <span class="float-left">View Details</span>
+                                  <span class="float-right">
+                                    <i class="fa fa-angle-right"></i>
+                                  </span>
+                                </a>
+                              </div>
+                            </div>
+                          {% endfor %}
+                        {% endif %}
+                      </div>
+                    </div>
+                    <div class="col-1 mb-3 next-pointer">
+                      <a href="#" class="btn next fa fa-fw fa-arrow-right" id="slideRight"></a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="mb-0 mt-4 font-size-12 font-600">Recent Activities </div>
+          <hr class="mt-2">
+          <div class="card mb-3">
+            <div class="card-header">
+              <i class="fa fa-bell-o"></i>  Recent Activity
+            </div>
+            <div class="list-group list-group-flush small">
+              <a class="list-group-item list-group-item-action" href="#">
+                <div class="media">
+                  <div class="media-body">
+                    You created a new Strategy
+                    <strong>MA on Reliance</strong>.
+                    <div class="text-muted smaller">Today at 5:43 PM</div>
+                  </div>
+                </div>
+              </a>
+              <a class="list-group-item list-group-item-action" href="#">
+                <div class="media">
+                  <div class="media-body">
+                    You updated a Strategy MA on Reliance
+                    <div class="text-muted smaller">Today at 6:37 PM</div>
+                  </div>
+                </div>
+              </a>
+              <a class="list-group-item list-group-item-action" href="#">View all activity...</a>
+            </div>
+            <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <footer class="sticky-footer">
+      <div class="container">
+        <div class="text-center">
+          <small>Copyright © Strategify 2022</small>
+        </div>
+      </div>
+    </footer>
+  </div>
+  <script src="{% static 'node_modules/jquery/dist/jquery.slim.min.js' %}"></script>
+  <script src="{% static 'node_modules/popper.js/dist/umd/popper.min.js' %}"></script>
+  <script src="{% static 'node_modules/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+  <script src="{% static '././JS/dashboard.js' %}"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="{% static 'node_modules/jquery/dist/jquery.min.js' %}"></script>
+  <script>
+    csrfmiddlewaretoken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+
+    $.ajax({
+            type:"POST",
+            url:'{% url 'indexdata' %}',
+            data:{
+              'csrfmiddlewaretoken': csrfmiddlewaretoken,
+            },
+            success :function(data){
+            if(data.success){
+                const container = document.getElementById('indexData');
+                for(let i=0;i<4;i++){
+                  var change = "";
+                  var arrow = "";
+                  if(parseFloat(data.success.data[i].percChange)>0.00){
+                    change = "bg-success1";
+                    arrow = "fa-arrow-up";
+                  }else{
+                    change = "bg-danger1";
+                    arrow = "fa-arrow-down"
+                  }
+                  const content = `<div class="col-xl-3 col-sm-6 mb-3">
+                                      <div class="card text-white `+change+` o-hidden h-100">
+                                        <div class="card-body">
+                                          <div class="card-body-icon">
+                                            <i class="fa fa-fw fa-line-chart"></i>
+                                          </div>
+                                          <div class="mr-5 font-13">`+data.success.data[i].indexName+`</div>
+                                        </div>
+                                        <a class="card-footer text-white clearfix small z-1" href="#">
+                                          <span class="float-left">`+data.success.data[i].last+`  `+`</span>
+                                          <span><i class="fa `+arrow+` p-1"></i></span>
+                                        </a>
+                                      </div>
+                                    </div>`
+                        container.innerHTML += content;
+                }
+               }
+               else{
+               console.log(data.error);
+               }
+            }
+        })
+
+    function openStrategy(arg){
+       window.location.href = "{% url 'openStrategy' %}" + "?strategyid="+"{{userdata.username}}"+arg;
+      return false;
+    }
+
+    function opensampleStrategy(arg){
+       window.location.href = "{% url 'opensampleStrategy' %}" + "?strategyid="+arg;
+        return false;
+    }
+
+    </script>
+</body>
+</html>

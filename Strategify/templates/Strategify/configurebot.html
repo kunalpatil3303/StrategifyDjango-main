@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  {% load static %}
+  <link rel="stylesheet" href="{% static './././node_modules/bootstrap/dist/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static './././node_modules/font-awesome/css/font-awesome.min.css' %}">
+  <link rel="stylesheet" href="{% static '././node_modules/bootstrap-social/bootstrap-social.css' %}">
+  <link rel="stylesheet" href="{% static './CSS/dashboard.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <title>{{userdata.username}}</title>
+</head>
+<body class="fixed-nav sticky-footer bg-dark" id="page-top">
+    {% csrf_token %}
+    <nav class="navbar navbar-expand-xl navbar-dark bg-dark fixed-top" id="mainNav">
+        <a class="navbar-brand brand" href="{% url 'home' %}">Strategify</a>
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
+                <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dashboard">
+                    <a class="nav-link" href="{% url 'dashboard' %}">
+                        <i class="fa fa-fw fa-dashboard"></i>
+                        <span class="nav-link-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+                    <a class="nav-link" href="{% url 'charts' %}">
+                        <i class="fa fa-fw fa-area-chart"></i>
+                        <span class="nav-link-text">Charts</span>
+                  </a>
+                </li>
+                <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Live Trades">
+                    <a class="nav-link" href="{% url 'deploypage' %}">
+                        <i class="fa fa-fw fa-table"></i>
+                        <span class="nav-link-text">Deployed Paper Trades</span>
+                    </a>
+                </li>
+                <li class="nav-item" data-toggle="tooltip" data-placement="right">
+                    <a class="nav-link" href="{% url 'configure' %}">
+                        <i class="fa fa-fw fa-link"></i>
+                        <span class="nav-link-text">Configure Bot</span>
+                    </a>
+                </li>
+                <li class="nav-item" data-toggle="tooltip" data-placement="right">
+                    <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseExamplePages" data-parent="#exampleAccordion">
+                        <i class="fa fa-fw fa-user"></i>
+                        <span class="nav-link-text">{{userdata.name}}</span>
+                    </a>
+                    <ul class="sidenav-second-level collapse" id="collapseExamplePages">
+                        <li>
+                            <a href="{% url 'profilepage' %}">Profile</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <ul class="navbar-nav sidenav-toggler">
+                <li class="nav-item">
+                    <a class="nav-link text-center" id="sidenavToggler">
+                        <i class="fa fa-fw fa-angle-left"></i>
+                    </a>
+                </li>
+            </ul>
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle ml-lg-4" id="alertsDropdown" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-fw fa-bell"></i>
+                        <span class="d-lg-none">Alerts
+                            <span class="badge badge-pill badge-warning">6 New</span>
+                        </span>
+                        <span class="indicator text-warning d-none d-lg-block">
+                            <i class="fa fa-fw fa-circle"></i>
+                        </span>
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="alertsDropdown">
+                        <h6 class="dropdown-header">New Alerts:</h6>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#">
+                            <span class="text-success">
+                                <strong>
+                                    <i class="fa fa-long-arrow-up fa-fw"></i>Status Update
+                                </strong>
+                            </span>
+                            <span class="small float-right text-muted">11:21 AM</span>
+                            <div class="dropdown-message small">This is an automated server response message. All systems are online.
+                            </div>
+                        </a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#">
+                        <span class="text-danger">
+                            <strong>
+                                <i class="fa fa-long-arrow-down fa-fw"></i>Status Update
+                            </strong>
+                        </span>
+                        <span class="small float-right text-muted">11:21 AM</span>
+                        <div class="dropdown-message small">This is an automated server response message. All systems are online.
+                        </div>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#">
+                        <span class="text-success">
+                            <strong>
+                                <i class="fa fa-long-arrow-up fa-fw"></i>Status Update
+                            </strong>
+                        </span>
+                        <span class="small float-right text-muted">11:21 AM</span>
+                        <div class="dropdown-message small">This is an automated server response message. All systems are online.
+                        </div>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item small" href="#">View all alerts</a>
+                </div>
+            </li>
+          </ul>
+        </div>
+    </nav>
+
+    <div class="content-wrapper">
+        <div class="container-fluid">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active">Configure</li>
+            </ol>
+            {% if data.isconfigured %}
+                {% if not data.access %}
+                <div class="error-card">
+                    <div class="container p-2 border border-dark">
+                        <div id="dailyconfigureaccess" class="p-2">
+                            <p class="alert alert-success" id="daily_acess_code_error"></p>
+                            <div class="form-group d-flex align-items-center flex-column">
+                                <label for="daily_configure_access_code" class="primary-color font-16 font-weight-bold">Access Code</label><br><br>
+                                <input type="text" name="daily_configure_access_code" id="daily_configure_access_code" placeholder="Access Code" required class="form-control">
+                                <br>
+                                <button type="button" class="text-light btn bg-primary-color w-25 rounded-pill shadow-sm" id="daily_access_code_btn" onclick="return daily_access_code()">
+                                 Done
+                                </button>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-6 col-lg-6 col-xl-6 col-12 d-flex flex-row align-items-baseline">
+                                <label class="font-weight-bold p-4 h6">URL: </label>
+                                <div class="form-control input-group flex-column text-truncate  overflow-x-auto">
+                                    <p class="align-self-start">{{data.botdata.url}}</p>
+                                    <span class="align-self-end padding-left-inherit"><i class="fa fa-clone"></i></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-6 col-xl-6 col-12 d-flex flex-row align-items-baseline">
+                                <label class="font-weight-bold p-4 h6">Id: </label>
+                                <div class="form-control input-group flex-column">
+                                    <p class="">{{data.botdata.userid}}</p>
+                                    <span class="align-self-end"><i class="fa fa-clone"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <hr class="hr">
+                                <div class="table-responsive">
+                                <table class="table table-fixed">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Date</th>
+                                            <th scope="col">Time</th>
+                                            <th scope="col">Scrip</th>
+                                            <th scope="col">Price</td>
+                                            <th scope="col">Type</th>
+                                            <th scope="col">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for i in data.orderdata %}
+                                            {% if i.condition == "error" %}
+                                                <tr class="bg-danger2">
+                                                    <th>{{i.date}}</th>
+                                                    <td>{{i.time}}</td>
+                                                    <td>{{i.scrip}}</td>
+                                                    <td>{{i.price}}</td>
+                                                    <td>{{i.transaction_type}}</td>
+                                                    <td>{{i.message}}</td>
+                                                </tr>
+                                            {% else %}
+                                                <tr>
+                                                    <th>{{i.date}}</th>
+                                                    <td>{{i.time}}</td>
+                                                    <td>{{i.scrip}}</td>
+                                                    <td>{{i.price}}</td>
+                                                    <td>{{i.transaction_type}}</td>
+                                                    <td>{{i.message}}</td>
+                                                </tr>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="table-responsive order-table">
+                                <table class="table">
+                                    
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}   
+                {% else %}
+                <div class="row">
+                    <div class="col-lg-7 mx-auto">
+                        <p class="h3 text-center">Configure Your Kotak Account.</p>
+                        <div class="bg-white rounded-lg shadow-sm p-5">
+                            <p class="alert" id="configure-alert"></p>
+                            {% csrf_token %}
+                            <div id="configuredetails">
+                                <div class="form-group">
+                                    <label for="access_token" class="primary-color">Access Token</label>
+                                    <input type="text" id="access_token" name="access_token" placeholder="Access Token" required class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="user_id" class="primary-color">User Id</label>
+                                    <input type="text" id="user_id" name="user_id" placeholder="User Id" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="configure_consumer_key" class="primary-color">Consumer Key</label>
+                                    <input type="text" id="configure_consumer_key" name="configure_consumer_key" placeholder="Consumer Key" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="configure_password" class="primary-color">Password</label>
+                                    <input type="text" id="configure_password" name="configure_password" placeholder="Demat Password" class="form-control" required>
+                                </div>
+                                <button type="button" class="text-light btn bg-primary-color btn-block rounded-pill shadow-sm" onclick="return configuredetails()"> Next
+                                </button>
+                            </div>
+                            <div id="configureaccess">
+                                <div class="form-group">
+                                    <label for="access_code" class="primary-color">Access Code</label>
+                                    <input type="text" name="access_code" id="access_code" placeholder="Access Code" required class="form-control">
+                                </div>
+                                <button type="button" class="text-light btn bg-primary-color btn-block rounded-pill shadow-sm" onclick="return configureaccess()"> Next
+                                </button>
+                            </div>
+                            <div id="configureurl">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" aria-describedby="basic-addon2" id="generate-url">
+                                        <div class="input-group-append copy-bar" onclick="return copytext()">
+                                            <span class="input-group-text"><i class="fa fa-clone"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="subscribe text-light btn bg-primary-color btn-block shadow-sm" onclick="return configureComplete()"> Done
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <footer class="sticky-footer">
+      <div class="container">
+        <div class="text-center">
+            <small>Copyright © Strategify 2022</small>
+        </div>
+      </div>
+    </footer>
+   
+    <!-- jQuery first, then Popper.js, then Bootstrap JS. -->
+    <script src="{% static 'node_modules/jquery/dist/jquery.slim.min.js' %}"></script>
+    <script src="{% static 'node_modules/popper.js/dist/umd/popper.min.js' %}"></script>
+    <script src="{% static 'node_modules/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+    <script src="{% static '././JS/dashboard.js' %}"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+
+    console.log({{error}});
+
+        function configuredetails(){
+            access_token = document.getElementById("access_token").value;
+            user_id = document.getElementById("user_id").value;
+            consumer_key = document.getElementById("configure_consumer_key").value;
+            password = document.getElementById("configure_password").value;
+            config_error = document.getElementById("configure-alert");
+            csrfmiddlewaretoken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+            if(access_token == ""){
+                document.getElementById("access_token").focus();
+                return false;
+            }else if(user_id == ""){
+                document.getElementById("user_id").focus();
+                return false;
+            }else if(consumer_key == ""){
+                document.getElementById("configure_consumer_key").focus();
+                return false;
+            }else if(password == ""){
+                document.getElementById("configure_password").focus();
+                return false;
+            }
+
+            $.ajax({
+                type:"POST",
+                url:'{% url 'configurebotdetails' %}',
+                data:{
+                  'csrfmiddlewaretoken': csrfmiddlewaretoken,
+                  'access_token':access_token,
+                  'user_id':user_id,
+                  'consumer_key':consumer_key,
+                  'password':password,
+                },
+                success :function(data){
+                    console.log(data);
+                    if(data.success){
+                        document.getElementById("configuredetails").style.display = "none";
+                        document.getElementById("configureaccess").style.display = "block";
+                        config_error.innerHTML = data.success;
+                        config_error.classList.add("alert-success");
+                        document.getElementById("configure-alert").style.display = "block";
+
+                    }else{
+                        config_error.innerHTML = data.error;
+                        config_error.classList.add("alert-danger");
+                        document.getElementById("configure-alert").style.display = "block";
+                    }
+                },
+            })
+            return false;
+        }
+
+        function configureaccess(){
+            access_token = document.getElementById("access_token").value;
+            user_id = document.getElementById("user_id").value;
+            consumer_key = document.getElementById("configure_consumer_key").value;
+            password = document.getElementById("configure_password").value;
+            access_code = document.getElementById("access_code").value
+            config_error = document.getElementById("configure-alert");
+            csrfmiddlewaretoken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+            if(access_token == ""){
+                document.getElementById("access_token").focus();
+                return false;
+            }else if(user_id == ""){
+                document.getElementById("user_id").focus();
+                return false;
+            }else if(consumer_key == ""){
+                document.getElementById("configure_consumer_key").focus();
+                return false;
+            }else if(password == ""){
+                document.getElementById("configure_password").focus();
+                return false;
+            }else if (access_code == ""){
+                document.getElementById("access_code").focus();
+                return false;
+            }
+            $.ajax({
+                type:"POST",
+                url:'{% url 'savebotdetails' %}',
+                data:{
+                  'csrfmiddlewaretoken': csrfmiddlewaretoken,
+                  'access_token':access_token,
+                  'user_id':user_id,
+                  'consumer_key':consumer_key,
+                  'password':password,
+                  'access_code':access_code,
+                },
+                success :function(data){
+                    console.log(data);
+                    if(data.success){
+                        config_error.classList.remove("alert-danger");
+                        document.getElementById("configureaccess").style.display = "none";
+                        document.getElementById("configureurl").style.display = "block";
+                        config_error.style.display = "block";
+                        config_error.innerHTML = data.success;
+                        config_error.classList.add("alert-success");
+                        document.getElementById("generate-url").value = data.data;
+
+                    }else{
+                        config_error.classList.remove("alert-success");
+                        config_error.style.display = "block";
+                        config_error.innerHTML = data.error;
+                        config_error.classList.add("alert-danger");
+                    }
+                },
+            })
+            return false;
+        }
+
+        function daily_access_code(){
+            daily_configure_access_code = document.getElementById("daily_configure_access_code").value;
+            daily_acess_code_error = document.getElementById("daily_acess_code_error");
+            csrfmiddlewaretoken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+
+            if(daily_configure_access_code == ""){
+                document.getElementById("daily_configure_access_code").focus();
+                return false;
+            }
+
+            var btn = document.getElementById("daily_access_code_btn");
+            var newElement = document.createElement("span");
+            newElement.setAttribute('id', "daily_access_progress");
+            newElement.setAttribute('class', "spinner-border spinner-border-sm");
+            newElement.setAttribute('role', "status");
+            newElement.setAttribute('aria-hidden', "true");
+            btn.appendChild(newElement);
+
+            $.ajax({
+                type:"POST",
+                url:'{% url 'daily_acess_code' %}',
+                data:{
+                  'csrfmiddlewaretoken': csrfmiddlewaretoken,
+                  'access_code':daily_configure_access_code,
+                },
+                success :function(data){
+                    console.log(data);
+                    if(data.success){
+                        var element = document.getElementById("daily_access_progress");
+                        element.parentNode.removeChild(element);
+                        daily_acess_code_error.classList.remove("alert-danger");
+                        daily_acess_code_error.style.display = "block";
+                        daily_acess_code_error.innerHTML = data.success;
+                        daily_acess_code_error.classList.add("alert-success");
+                        window.location.reload();
+                    }else{
+                        var element = document.getElementById("daily_access_progress");
+                        element.parentNode.removeChild(element);
+                        daily_acess_code_error.classList.remove("alert-success");
+                        daily_acess_code_error.style.display = "block";
+                        daily_acess_code_error.innerHTML = data.error;
+                        daily_acess_code_error.classList.add("alert-danger");
+                    }
+                },
+            })
+            return false;
+        }
+
+
+        function configureComplete(){
+            location.reload();
+            return false
+        }
+
+        function copytext(){
+              var copyText = document.getElementById("generate-url");
+              copyText.select();
+              copyText.setSelectionRange(0, 99999);
+              navigator.clipboard.writeText(copyText.value);
+              config_error.style.display = "block";
+              config_error.innerHTML = "Copied";
+              config_error.classList.add("alert-success");
+              return false;
+        }
+
+
+        function refresh(){
+            
+        }
+        
+
+    </script>
+
+    </body>
+</html>
+

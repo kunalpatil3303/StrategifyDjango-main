@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  {% load static %}
+  <link rel="stylesheet" href="{% static './././node_modules/bootstrap/dist/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static './././node_modules/font-awesome/css/font-awesome.min.css' %}">
+  <link rel="stylesheet" href="{% static '././node_modules/bootstrap-social/bootstrap-social.css' %}">
+  <link rel="stylesheet" href="{% static './CSS/dashboard.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <title>{{userdata.username}}</title>
+</head>
+<body class="fixed-nav sticky-footer bg-dark" id="page-top">
+  {% csrf_token %}
+  <nav class="navbar navbar-expand-xl navbar-dark bg-dark fixed-top" id="mainNav">
+    <a class="navbar-brand brand" href="{% url 'home' %}">Strategify</a>
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarResponsive">
+      <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dashboard">
+          <a class="nav-link" href="{% url 'dashboard' %}">
+            <i class="fa fa-fw fa-dashboard"></i>
+            <span class="nav-link-text">Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+          <a class="nav-link" href="#">
+            <i class="fa fa-fw fa-area-chart"></i>
+            <span class="nav-link-text">Charts</span>
+          </a>
+        </li>
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Live Trades">
+          <a class="nav-link" href="{% url 'deploypage' %}">
+            <i class="fa fa-fw fa-table"></i>
+            <span class="nav-link-text">Deployed Paper Trades</span>
+          </a>
+        </li>
+        <li class="nav-item" data-toggle="tooltip" data-placement="right">
+          <a class="nav-link" href="{% url 'configure' %}">
+            <i class="fa fa-fw fa-link"></i>
+            <span class="nav-link-text">Configure Bot</span>
+          </a>
+        </li>
+        <li class="nav-item" data-toggle="tooltip" data-placement="right">
+          <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseExamplePages" data-parent="#exampleAccordion">
+            <i class="fa fa-fw fa-user"></i>
+            <span class="nav-link-text">{{userdata.name}}</span>
+          </a>
+          <ul class="sidenav-second-level collapse" id="collapseExamplePages">
+            <li>
+              <a href="{% url 'profilepage' %}">Profile</a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <ul class="navbar-nav sidenav-toggler">
+        <li class="nav-item">
+          <a class="nav-link text-center" id="sidenavToggler">
+            <i class="fa fa-fw fa-angle-left"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <div class="content-wrapper">
+    <div class="container-fluid">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item active">Charts</li>
+      </ol>
+      <div class="row" id="indexData">
+        
+      </div>
+
+      {% if status.error %}
+
+        <div class="error-card">
+            <div class="card text-center w-50">
+                <div class="card-header">
+                        Connection Error
+                </div>
+                <div class="card-body">
+                    <p class="card-text text-danger">{{status.error}}.</p>
+                    <a href="#" class="btn btn-primary">Need Help!</a>
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+
+        <div class="row">
+        <div class="col-lg-12">
+          <!-- Example Bar Chart Card-->
+          <div class="card mb-3">
+            <div class="card-header">
+              <i class="fa fa-bar-chart"></i> Line Chart Example</div>
+              <div class="card-body search-input">
+                <div class="row">
+                  <div class="col-lg-4 col-xs-12 col-sm-12">
+                    <div class="input-group">
+                      <input type="text" class="form-control" placeholder="Search Name..." id="searchstock" onkeyup="searchStockByName()">
+                      <span class="input-group-append">
+                        <button class="btn btn-primary" type="button" onclick="return searchStockName()">
+                          <i class="fa fa-search"></i>
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="col-lg-8 col-xs-12 col-sm-12">
+                    <div class="selector">
+                        <div class="selecotr-item">
+                            <input type="radio" value="5d" id="radio2" name="period" class="selector-item_radio" onclick="searchStockName()">
+                            <label for="radio2" class="selector-item_label">5d</label>
+                        </div>
+                        <div class="selecotr-item">
+                            <input type="radio" value="1mo" id="radio3" name="period" class="selector-item_radio"onclick="searchStockName()">
+                            <label for="radio3" class="selector-item_label">1mo</label>
+                        </div>
+                        <div class="selecotr-item">
+                            <input type="radio" value="6mo" id="radio4" name="period" class="selector-item_radio" checked onclick="searchStockName()">
+                            <label for="radio4" class="selector-item_label">6mo</label>
+                        </div>
+                        <div class="selecotr-item">
+                            <input type="radio" value="1y" id="radio5" name="period" class="selector-item_radio" onclick="searchStockName()">
+                            <label for="radio5" class="selector-item_label">1y</label>
+                        </div>
+                        <div class="selecotr-item">
+                            <input type="radio" value="5y" id="radio6" name="period" class="selector-item_radio" onclick="searchStockName()">
+                            <label for="radio6" class="selector-item_label">5y</label>
+                        </div>
+                        <div class="selecotr-item">
+                            <input type="radio" value="max" id="radio7" name="period" class="selector-item_radio"onclick="searchStockName()">
+                            <label for="radio7" class="selector-item_label">max</label>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <ul class="autocom-box col-lg-4 col-xs-12 col-sm-12" id="autocom-box">
+                    
+                  </ul>
+                </div>
+                <div class="row">
+                  <div class="col-12 my-auto">
+                    <div id="chartContainer"></div>
+                  </div>
+                </div>
+              </div>
+            <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+          </div>
+        </div>
+      </div>
+      <div class="card mb-3">
+        <div class="card-header">
+          <i class="fa fa-table"></i> Today Market</div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <div>
+                <label>Top Gainers</label>
+                <div class="float-right">
+                  <a href="" id="topgainersrefresh" onclick='return topgainersrefresh()'><i class="fa fa-refresh "></i></a>
+                </div>
+            </div>
+            <table class="table table-bordered" width="100%" cellspacing="0">
+              <thead class="bg-success1">
+                <tr>
+                  <th>SYMBOL</th>
+                  <th>OPEN</th>
+                  <th>HIGH</th>
+                  <th>CLOSE</th>
+                  <th>PREV. CLOSE</th>
+                  <th>VOLUME</th>
+                </tr>
+              </thead>
+              <tfoot>
+              <tbody id="topgainerstable" class="topgainerstable">
+
+              </tbody>
+            </table>
+            <div>
+              <label>Top Losers</label>
+              <div class="float-right">
+                <a href="" id="toplosersrefresh" onclick='return toplosersrefresh()'><i class="fa fa-refresh"></i></a>
+              </div>
+            </div>
+            <table class="table table-bordered" width="100%" cellspacing="0">
+              <thead class="bg-danger1">
+                <tr>
+                  <th>SYMBOL</th>
+                  <th>OPEN</th>
+                  <th>HIGH</th>
+                  <th>CLOSE</th>
+                  <th>PREV. CLOSE</th>
+                  <th>VOLUME</th>
+                </tr>
+              </thead>
+              <tfoot>
+              <tbody id="toploserstable" class="toploserstable">
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card-footer small text-muted"><span><label id="topgainers-updatetime"></label></span></div>
+      </div>
+
+      {% endif %}
+
+    <footer class="sticky-footer">
+      <div class="container">
+        <div class="text-center">
+          <small>Copyright © Strategify 2022</small>
+        </div>
+      </div>
+    </footer>
+
+    <div id="snackbar">Some text some message..</div>
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS. -->
+    <script src="{% static 'node_modules/jquery/dist/jquery.slim.min.js' %}"></script>
+    <script src="{% static 'node_modules/popper.js/dist/umd/popper.min.js' %}"></script>
+    <script src="{% static 'node_modules/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+    <script src="{% static '././JS/dashboard.js' %}"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="{% static 'node_modules/jquery/dist/jquery.min.js' %}"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+      csrfmiddlewaretoken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+
+      const searchWrapper = document.querySelector(".search-input");
+      const inputBox = searchWrapper.querySelector("input");
+      const suggBox = searchWrapper.querySelector(".autocom-box");
+      let scripList = {{userdata.allscripname|safe}};
+      var selectedscrip = ""
+
+      function searchStockByName(){
+          
+          let userData = document.getElementById("searchstock").value;
+          let emptyArray = [];
+          if(userData){
+              emptyArray = scripList.filter((data)=>{
+                  return data.toLocaleLowerCase().startsWith(userData.toLocaleLowerCase());
+              });
+              emptyArray = emptyArray.map((data)=>{
+                  return data = `<li>${data}</li>`;
+              });
+              searchWrapper.classList.add("active");
+
+              showStockSuggestions(emptyArray);
+              let allList = suggBox.querySelectorAll("li");
+              for (let i = 0; i < allList.length; i++) {
+                  allList[i].setAttribute("name", "this.innerText");
+                  allList[i].setAttribute("onclick", "selectscrip(this.innerText)");
+              }
+          }else{
+              searchWrapper.classList.remove("active");
+          }
+      }
+
+      function showStockSuggestions(list){
+          let listData;
+          if(!list.length){
+              userValue = inputBox.value;
+              listData = `<li>${userValue}</li>`;
+          }else{
+            listData = list.join('');
+          }
+          suggBox.innerHTML = listData;
+      }
+
+      function changeDateFormat(date){
+        date = date.split("-")
+        date.reverse();
+        newDate = ""
+        for(let i=0;i<date.length;i++){
+          newDate += date[i]+"-";
+        }
+        newDate = newDate.substring(0, newDate.length - 1);
+        return newDate
+      }
+
+      function selectscrip(element){
+        selectedscrip = element;
+        document.getElementById("searchstock").value = element;
+        searchStockName();
+      }
+
+      
+      function searchStockName(){
+          element = document.getElementById("searchstock").value;
+          searchWrapper.classList.remove("active");
+          period = document.querySelector('input[name="period"]:checked').value;
+
+          if(element != ""){
+            $.ajax({
+            type:"POST",
+            url:'{% url 'stockdata' %}',
+            data:{
+              'csrfmiddlewaretoken': csrfmiddlewaretoken,
+              'scripname': element,
+              'period':period,
+            },
+            success :function(data){
+
+            if(data.success && data.success.length > 0){
+
+              google.charts.load('current', {'packages':['line']});
+              google.charts.setOnLoadCallback(drawChart);
+
+              function drawChart() {
+
+                var points = new google.visualization.DataTable();
+                points.addColumn('string', 'Day');
+                points.addColumn('number', 'Close');
+                var arr = []
+                for(let i =0;i<data.success.length;i++){
+                  var x = []
+                  x.push(data.success[i][1]);
+                  x.push(data.success[i][0]);
+                  arr.push(x);
+                }
+
+                points.addRows(arr);
+
+                var options = {
+                  chart: {
+                    title: element,
+                  },
+                  width: 1500,
+                  height: 500
+                };
+
+                var chart = new google.charts.Line(document.getElementById('chartContainer'));
+
+                chart.draw(points, google.charts.Line.convertOptions(options));
+                }
+               }
+               else{
+                var x = document.getElementById("snackbar");
+                x.innerHTML = data.error;
+                x.className = "show";
+                setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+               }
+              }
+            })
+          }
+      }
+
+    $.ajax({
+            type:"POST",
+            url:'{% url 'indexdata' %}',
+            data:{
+              'csrfmiddlewaretoken': csrfmiddlewaretoken,
+            },
+            success :function(data){
+            if(data.success){
+                const container = document.getElementById('indexData');
+                for(let i=0;i<4;i++){
+                  var change = "";
+                  var arrow = "";
+                  if(parseFloat(data.success.data[i].percChange)>0.00){
+                    change = "bg-success1";
+                    arrow = "fa-arrow-up";
+                  }else{
+                    change = "bg-danger1";
+                    arrow = "fa-arrow-down"
+                  }
+                  const content = `<div class="col-xl-3 col-sm-6 mb-3">
+                                      <div class="card text-white `+change+` o-hidden h-100">
+                                        <div class="card-body">
+                                          <div class="card-body-icon">
+                                            <i class="fa fa-fw fa-line-chart"></i>
+                                          </div>
+                                          <div class="mr-5">`+data.success.data[i].indexName+`</div>
+                                        </div>
+                                        <a class="card-footer text-white clearfix small z-1" href="#">
+                                          <span class="float-left">`+data.success.data[i].last+`  `+`</span>
+                                          <span><i class="fa `+arrow+` p-1"></i></span>
+                                        </a>
+                                      </div>
+                                    </div>`
+                        container.innerHTML += content;
+                }
+               }
+               else{
+               console.log(data.error);
+               }
+            }
+        })
+
+    topgainersrefresh();
+    toplosersrefresh();
+
+    function topgainersrefresh(){
+      $.ajax({
+            type:"POST",
+            url:'{% url 'topgainers' %}',
+            data:{
+              'csrfmiddlewaretoken': csrfmiddlewaretoken,
+            },
+            success :function(data){
+            if(data.success){
+                document.getElementById("topgainers-updatetime").innerHTML = "Updated at "+data.success.time;
+
+                var topgainertable = document.querySelector(".topgainerstable");
+                topgainertable.innerHTML = "";
+                for(let i=0;i<5;i++){
+                  let tablerow = document.createElement('tr');
+
+                  let symbol = document.createElement('td');
+                  symbol.innerText = data.success.data[i].symbol;
+
+                  let open = document.createElement('td');
+                  open.innerText = data.success.data[i].openPrice;
+
+                  let high = document.createElement('td');
+                  high.innerText = data.success.data[i].highPrice;
+
+                  let close = document.createElement('td');
+                  close.innerText = data.success.data[i].ltp;
+
+                  let prevClose = document.createElement('td');
+                  prevClose.innerText = data.success.data[i].previousPrice;
+
+                  let volume = document.createElement('td');
+                  volume.innerText = data.success.data[i].tradedQuantity;
+
+                  tablerow.append(symbol,open,high,close,prevClose,volume);
+                  topgainertable.append(tablerow);
+                }
+               }
+               else{
+               console.log(data.error);
+               //document.getElementById("topgainers-updatetime").innerHTML = "Updated at "+data.success.time;
+
+                var topgainertable = document.querySelector(".topgainerstable");
+                topgainertable.innerHTML = "";
+                let tablerow = document.createElement('tr');
+                let error = document.createElement('td');
+                error.innerText = data.error;
+                error.setAttribute("colspan", "6");
+                tablerow.append(error);
+                topgainertable.append(tablerow);
+                console.log(error);
+                console.log(tablerow);
+                console.log(topgainertable);
+               }
+            }
+        })
+      return false;
+    }
+
+    function toplosersrefresh(){
+      $.ajax({
+            type:"POST",
+            url:'{% url 'toplosers' %}',
+            data:{
+              'csrfmiddlewaretoken': csrfmiddlewaretoken,
+            },
+            success :function(data){
+            if(data.success){
+
+                document.getElementById("topgainers-updatetime").innerHTML = "Updated at "+data.success.time;
+
+                let toplosertable = document.querySelector(".toploserstable");
+                toplosertable.innerText = "";
+                for(let i=0;i<5;i++){
+                  let tablerow = document.createElement('tr');
+
+                  let symbol = document.createElement('td');
+                  symbol.innerText = data.success.data[i].symbol;
+
+                  let open = document.createElement('td');
+                  open.innerText = data.success.data[i].openPrice;
+
+                  let high = document.createElement('td');
+                  high.innerText = data.success.data[i].highPrice;
+
+                  let close = document.createElement('td');
+                  close.innerText = data.success.data[i].ltp;
+
+                  let prevClose = document.createElement('td');
+                  prevClose.innerText = data.success.data[i].previousPrice;
+
+                  let volume = document.createElement('td');
+                  volume.innerText = data.success.data[i].tradedQuantity;
+
+                  tablerow.append(symbol,open,high,close,prevClose,volume);
+                  toplosertable.append(tablerow);
+                }
+               }
+               else{
+               console.log(data.error);
+                let toplosertable = document.querySelector(".toploserstable");
+                toplosertable.innerText = "";
+                let tablerow = document.createElement('tr');
+                let error = document.createElement('td');
+                error.innerText = data.error;
+                error.setAttribute("colspan", "6");
+                tablerow.append(error);
+                toplosertable.append(tablerow);
+               }
+            }
+        })
+      return false;
+    }
+    </script>
+</body>
+</html>

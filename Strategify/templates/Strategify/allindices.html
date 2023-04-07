@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  {% load static %}
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="{% static './././node_modules/bootstrap/dist/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static './././node_modules/font-awesome/css/font-awesome.min.css' %}">
+  <link rel="stylesheet" href="{% static '././node_modules/bootstrap-social/bootstrap-social.css' %}">
+  <link rel="stylesheet" href="{% static './CSS/dashboard.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <title>{{data.username}}</title>
+</head>
+<body class="fixed-nav sticky-footer bg-dark" id="page-top">
+  <!-- Navigation-->
+  {% csrf_token %}
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
+    <a class="navbar-brand brand" href="{% url 'home' %}">Strategify</a>
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarResponsive">
+      <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dashboard">
+          <a class="nav-link" href="{% url 'dashboard' %}">
+            <i class="fa fa-fw fa-dashboard"></i>
+            <span class="nav-link-text">Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+          <a class="nav-link" href="{% url 'charts' %}">
+            <i class="fa fa-fw fa-area-chart"></i>
+            <span class="nav-link-text">Charts</span>
+          </a>
+        </li>
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Live Trades">
+          <a class="nav-link" href="{% url 'deploypage' %}">
+            <i class="fa fa-fw fa-table"></i>
+            <span class="nav-link-text">Deployed Paper Trades</span>
+          </a>
+        </li>
+        <li class="nav-item" data-toggle="tooltip" data-placement="right">
+          <a class="nav-link" href="{% url 'configure' %}">
+            <i class="fa fa-fw fa-link"></i>
+            <span class="nav-link-text">Configure Bot</span>
+          </a>
+        </li>
+        <li class="nav-item" data-toggle="tooltip" data-placement="right">
+          <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseExamplePages" data-parent="#exampleAccordion">
+            <i class="fa fa-fw fa-user"></i>
+            <span class="nav-link-text">{{data.name}}</span>
+          </a>
+          <ul class="sidenav-second-level collapse" id="collapseExamplePages">
+            <li>
+              <a href="{% url 'profilepage' %}">Profile</a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <ul class="navbar-nav sidenav-toggler">
+        <li class="nav-item">
+          <a class="nav-link text-center" id="sidenavToggler">
+            <i class="fa fa-fw fa-angle-left"></i>
+          </a>
+        </li>
+      </ul>
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <form class="form-inline my-2 my-lg-0 mr-lg-2">
+            {% csrf_token %}
+            <div class="input-group">
+              <input class="form-control" type="text" placeholder="Search Indices.." id="searchindices" onkeyup="searchIndices()">
+              <span class="input-group-append">
+                <button class="btn btn-primary" type="button">
+                  <i class="fa fa-search"></i>
+                </button>
+              </span>
+            </div>
+          </form>
+          <ul class="autocom-box" id="autocom-box">
+            
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <div class="content-wrapper">
+    <div class="container-fluid">
+      <!-- Breadcrumbs-->
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item active">All Indices</li>
+      </ol>
+      <!-- Area Chart Example-->
+      <div class="row">
+        <div class="col-lg-8">
+          <!-- Example Bar Chart Card-->
+          <hr class="mt-2">
+          <div class="card-columns">
+          </div>
+          <!-- /Card Columns-->
+        </div>
+      </div>
+      <div class="card mb-3">
+        <div class="card-header">
+          <i class="fa fa-table"></i>Live Index Watch</div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <div>
+                <label>Top Gainers</label>
+                <div class="float-right">
+                  <a href="" id="topgainersrefresh" onclick='return topgainersrefresh()'><i class="fa fa-refresh "></i></a>
+                </div>
+            </div>
+            <table class="table table-bordered" width="100%" cellspacing="0">
+              <thead class="bg-success1">
+                <tr>
+                  <th>SYMBOL</th>
+                  <th>CURRENT</th>
+                  <th>OPEN</th>
+                  <th>HIGH</th>
+                  <th>Low</th>
+                  <th>%CHANGE</th>
+                  <th>PREV. CLOSE</th>
+                </tr>
+              </thead>
+              <tfoot>
+              <tbody id="topgainerstable" class="topgainerstable">
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card-footer small text-muted"><span><label id="topgainers-updatetime"></label></span></div>
+      </div>
+    </div>
+    <!-- /.container-fluid-->
+    <!-- /.content-wrapper-->
+    <footer class="sticky-footer">
+      <div class="container">
+        <div class="text-center">
+          <small>Copyright © Strategify 2022</small>
+        </div>
+      </div>
+    </footer>
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+      <i class="fa fa-angle-up"></i>
+    </a>
+    <!-- Logout Modal-->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+            <a class="btn btn-primary" href="login.html">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS. -->
+    <script src="{% static 'node_modules/jquery/dist/jquery.slim.min.js' %}"></script>
+    <script src="{% static 'node_modules/popper.js/dist/umd/popper.min.js' %}"></script>
+    <script src="{% static 'node_modules/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+    
+    <script src="{% static '././JS/dashboard.js' %}"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script>
+    csrfmiddlewaretoken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+
+    topgainersrefresh();
+
+
+    function searchIndices() {
+      var input, filter, table, tr, td, i, txtValue;
+      input = document.getElementById("searchindices");
+      filter = input.value.toUpperCase();
+      table = document.getElementById("topgainerstable");
+      tr = table.getElementsByTagName("tr");
+
+      // Loop through all table rows, and hide those who don't match the search query
+      for (i = 0; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[0];
+        if (td) {
+          txtValue = td.textContent || td.innerText;
+          if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            tr[i].style.display = "";
+          } else {
+            tr[i].style.display = "none";
+          }
+        }
+      }
+    }
+
+
+    function topgainersrefresh(){
+      $.ajax({
+            type:"POST",
+            url:'{% url 'indexdata' %}',
+            data:{
+              'csrfmiddlewaretoken': csrfmiddlewaretoken,
+            },
+            success :function(data){
+            if(data.success){
+              console.log(data.success);
+                document.getElementById("topgainers-updatetime").innerHTML = "Updated at "+data.success.time;
+
+                var topgainertable = document.querySelector(".topgainerstable");
+                topgainertable.innerHTML = "";
+                for(let i=0;i<data.success.data.length;i++){
+                  let tablerow = document.createElement('tr');
+
+                  let symbol = document.createElement('td');
+                  symbol.innerText = data.success.data[i].indexName;
+
+                  let current = document.createElement('td');
+                  current.innerText = data.success.data[i].last;
+
+                  let open = document.createElement('td');
+                  open.innerText = data.success.data[i].open;
+
+                  let high = document.createElement('td');
+                  high.innerText = data.success.data[i].high;
+
+                  let low = document.createElement('td');
+                  low.innerText = data.success.data[i].low;
+
+                  let perchange = document.createElement('td');
+                  if(parseFloat(data.success.data[i].percChange)>0.00){
+                    perchange.setAttribute("class","text-success");
+                  }else{
+                    perchange.setAttribute("class","text-danger");
+                  }
+                  perchange.innerText = data.success.data[i].percChange;
+
+                  let prevClose = document.createElement('td');
+                  prevClose.innerText = data.success.data[i].previousClose;
+
+                  tablerow.append(symbol,current,open,high,low,perchange,prevClose);
+                  topgainertable.append(tablerow);
+                }
+
+                
+               }
+               else{
+               console.log(data.error);
+               //document.getElementById("topgainers-updatetime").innerHTML = "Updated at "+data.success.time;
+
+                var topgainertable = document.querySelector(".topgainerstable");
+                topgainertable.innerHTML = "";
+                let tablerow = document.createElement('tr');
+                let error = document.createElement('td');
+                error.innerText = data.error;
+                error.setAttribute("colspan", "7");
+                tablerow.append(error);
+                topgainertable.append(tablerow)
+               }
+            }
+        })
+      return false;
+    }
+
+    </script>
+</body>
+</html>
